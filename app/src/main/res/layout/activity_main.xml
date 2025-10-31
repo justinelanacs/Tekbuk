@@ -5,15 +5,413 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/one"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="hindot!"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <!--_____________________________________________APP NAME____________________________________________-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="72dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/Appname1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ᜆᜒᜃ᜔ᜊᜓᜃ᜔"
+            android:textColor="@color/black"
+            android:textSize="50sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/Appname2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEKBUK"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Appname1" />
+
+        <TextView
+            android:id="@+id/Content1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Pag-aaral ng Panitikang Filipino"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/Appname2" />
+
+        <!--_____________________________________________BUTTONS____________________________________________-->
+
+        <ScrollView
+            android:id="@+id/scrollContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            app:layout_constraintTop_toBottomOf="@id/Content1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/gridMainMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:alignmentMode="alignMargins"
+                app:columnCount="2"
+                app:columnOrderPreserved="false"
+                app:orientation="horizontal"
+                app:rowOrderPreserved="false"
+                app:useDefaultMargins="true">
+
+                <!-- 1️⃣ LAYUNIN -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardLayunin"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    app:layout_columnWeight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:strokeColor="@color/gray"
+                    app:strokeWidth="1dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:elevation="6dp"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/number1"
+                            android:layout_marginEnd="16dp"
+                            app:tint="@color/black" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="LAYUNIN"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:paddingBottom="10sp"/>
+
+                            <TextView
+                                android:text="Mga layuning dapat makamit."
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 2️⃣ PAKSA -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPaksa"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    app:layout_columnWeight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:strokeColor="@color/gray"
+                    app:strokeWidth="1dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:elevation="6dp"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/number2"
+                            android:layout_marginEnd="16dp"
+                            app:tint="@color/black" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="PAKSA"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:paddingBottom="10sp"/>
+
+                            <TextView
+                                android:text="Pangunahing paksa ng aralin."
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 3️⃣ PAGAWAIN -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardGawain"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    app:layout_columnWeight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:strokeColor="@color/gray"
+                    app:strokeWidth="1dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:elevation="6dp"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/number3"
+                            android:layout_marginEnd="16dp"
+                            app:tint="@color/black" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="GAWAIN"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:paddingBottom="10sp"/>
+
+                            <TextView
+                                android:text="Mga gawain at pagsasanay."
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 4️⃣ PAGTATAYA -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPagtataya"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    app:layout_columnWeight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:strokeColor="@color/gray"
+                    app:strokeWidth="1dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:elevation="6dp"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/number4"
+                            android:layout_marginEnd="16dp"/>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="PAGTATAYA"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:paddingBottom="10sp"/>
+
+                            <TextView
+                                android:text="Pagsusulit o pagtataya."
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 5️⃣ REPLEKSYON -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardRepleksyon"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    app:layout_columnWeight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:strokeColor="@color/gray"
+                    app:strokeWidth="1dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:elevation="6dp"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/number5"
+                            android:layout_marginEnd="16dp"
+                            app:tint="@color/black" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="REPLEKSYON"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:paddingBottom="10sp"/>
+
+                            <TextView
+                                android:text="Pagbabalik-tanaw sa aralin."
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 6️⃣ MARKA / ISKOR -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardIskor"
+                    android:layout_width="0dp"
+                    android:layout_height="150dp"
+                    app:layout_columnWeight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:strokeColor="@color/gray"
+                    app:strokeWidth="1dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:elevation="6dp"
+                    android:layout_margin="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:layout_gravity="center"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/number6"
+                            android:layout_marginEnd="16dp"
+                            app:tint="@color/black" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:text="MARKA/ ISKOR"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:paddingBottom="10sp"/>
+
+                            <TextView
+                                android:text="Mga resulta ng pagsusulit."
+                                android:textSize="14sp"
+                                android:textColor="@color/black"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </androidx.gridlayout.widget.GridLayout>
+        </ScrollView>
+
+        <!--_____________________________________________ENDS OF BUTTONS____________________________________________-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

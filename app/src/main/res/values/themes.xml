@@ -6,4 +6,5 @@
     </style>
 
     <style name="Theme.Tekbuk" parent="Base.Theme.Tekbuk" />
+    <style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar" />
 </resources>
