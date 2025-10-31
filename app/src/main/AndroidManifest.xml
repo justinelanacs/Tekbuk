@@ -12,6 +12,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tekbuk">
         <activity
+            android:name=".HomapageContent.MarkaPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomapageContent.RepleksyonPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomapageContent.PagtatayaPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomapageContent.GawainPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomapageContent.PaksaPageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomapageContent.LayuninPageActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
