@@ -1,22 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/one"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!--_____________________________________________APP NAME____________________________________________-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/menuButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/burger"
+            android:contentDescription="Menu"
+            android:padding="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+
+
+        <!--_____________________________________________APP NAME____________________________________________-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="72dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
 
         <TextView
             android:id="@+id/Appname1"
@@ -24,11 +44,15 @@
             android:layout_height="wrap_content"
             android:text="ᜆᜒᜃ᜔ᜊᜓᜃ᜔"
             android:textColor="@color/black"
-            android:textSize="50sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="50sp"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMinTextSize="20sp"
+            android:autoSizeMaxTextSize="70sp"
+            android:autoSizeStepGranularity="2sp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/Appname2"
@@ -36,22 +60,39 @@
             android:layout_height="wrap_content"
             android:text="TEKBUK"
             android:textColor="@color/black"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:autoSizeTextType="uniform"
+            android:textSize="17sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeMaxTextSize="27sp"
+            android:autoSizeStepGranularity="2sp"
+            app:layout_constraintTop_toBottomOf="@id/Appname1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Appname1" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/Content1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:text="Pag-aaral ng Panitikang Filipino"
             android:textColor="@color/black"
+            android:autoSizeTextType="uniform"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:autoSizeMinTextSize="8sp"
+            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeStepGranularity="2sp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/Appname2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Appname2" />
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="v-1.0.0"
+            android:textColor="@color/black"
+            android:layout_marginRight="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!--_____________________________________________BUTTONS____________________________________________-->
 
@@ -59,7 +100,7 @@
             android:id="@+id/scrollContainer"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             app:layout_constraintTop_toBottomOf="@id/Content1"
@@ -74,9 +115,6 @@
                 android:layout_gravity="center"
                 app:alignmentMode="alignMargins"
                 app:columnCount="2"
-                app:columnOrderPreserved="false"
-                app:orientation="horizontal"
-                app:rowOrderPreserved="false"
                 app:useDefaultMargins="true">
 
                 <!-- 1️⃣ LAYUNIN -->
@@ -86,7 +124,7 @@
                     android:layout_height="150dp"
                     app:layout_columnWeight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:cardBackgroundColor="#B3FBF9F1"
                     app:strokeColor="@color/gray"
                     app:strokeWidth="1dp"
                     android:clickable="true"
@@ -111,25 +149,31 @@
                             app:tint="@color/black" />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <TextView
                                 android:text="LAYUNIN"
-                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="10sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:paddingBottom="5dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:paddingBottom="10sp"/>
+                                android:layout_width="match_parent"/>
 
                             <TextView
                                 android:text="Mga layuning dapat makamit."
-                                android:textSize="14sp"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="16sp"
+                                android:autoSizeStepGranularity="1sp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"/>
+                                android:layout_width="match_parent"/>
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -141,7 +185,7 @@
                     android:layout_height="150dp"
                     app:layout_columnWeight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:cardBackgroundColor="#B3FBF9F1"
                     app:strokeColor="@color/gray"
                     app:strokeWidth="1dp"
                     android:clickable="true"
@@ -166,37 +210,43 @@
                             app:tint="@color/black" />
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
                             <TextView
                                 android:text="PAKSA"
-                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="10sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:paddingBottom="5dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:paddingBottom="10sp"/>
+                                android:layout_width="match_parent"/>
 
                             <TextView
                                 android:text="Pangunahing paksa ng aralin."
-                                android:textSize="14sp"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="16sp"
+                                android:autoSizeStepGranularity="1sp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"/>
+                                android:layout_width="match_parent"/>
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 3️⃣ PAGAWAIN -->
+                <!-- 3️⃣ GAWAIN -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardGawain"
                     android:layout_width="0dp"
                     android:layout_height="150dp"
                     app:layout_columnWeight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:cardBackgroundColor="#B3FBF9F1"
                     app:strokeColor="@color/gray"
                     app:strokeWidth="1dp"
                     android:clickable="true"
@@ -227,19 +277,25 @@
 
                             <TextView
                                 android:text="GAWAIN"
-                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="10sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:paddingBottom="5dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:paddingBottom="10sp"/>
+                                android:layout_width="match_parent"/>
 
                             <TextView
                                 android:text="Mga gawain at pagsasanay."
-                                android:textSize="14sp"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="16sp"
+                                android:autoSizeStepGranularity="1sp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"/>
+                                android:layout_width="match_parent"/>
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -251,7 +307,7 @@
                     android:layout_height="150dp"
                     app:layout_columnWeight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:cardBackgroundColor="#B3FBF9F1"
                     app:strokeColor="@color/gray"
                     app:strokeWidth="1dp"
                     android:clickable="true"
@@ -272,7 +328,8 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:src="@drawable/number4"
-                            android:layout_marginEnd="16dp"/>
+                            android:layout_marginEnd="16dp"
+                            app:tint="@color/black" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -281,19 +338,25 @@
 
                             <TextView
                                 android:text="PAGTATAYA"
-                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="10sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:paddingBottom="5dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:paddingBottom="10sp"/>
+                                android:layout_width="match_parent"/>
 
                             <TextView
                                 android:text="Pagsusulit o pagtataya."
-                                android:textSize="14sp"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="16sp"
+                                android:autoSizeStepGranularity="1sp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"/>
+                                android:layout_width="match_parent"/>
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -305,7 +368,7 @@
                     android:layout_height="150dp"
                     app:layout_columnWeight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:cardBackgroundColor="#B3FBF9F1"
                     app:strokeColor="@color/gray"
                     app:strokeWidth="1dp"
                     android:clickable="true"
@@ -336,19 +399,25 @@
 
                             <TextView
                                 android:text="REPLEKSYON"
-                                android:textSize="14sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="10sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:paddingBottom="5dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:paddingBottom="10sp"/>
+                                android:layout_width="match_parent"/>
 
                             <TextView
                                 android:text="Pagbabalik-tanaw sa aralin."
-                                android:textSize="14sp"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="16sp"
+                                android:autoSizeStepGranularity="1sp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"/>
+                                android:layout_width="match_parent"/>
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -360,7 +429,7 @@
                     android:layout_height="150dp"
                     app:layout_columnWeight="1"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#7FFBF9F1"
+                    app:cardBackgroundColor="#B3FBF9F1"
                     app:strokeColor="@color/gray"
                     app:strokeWidth="1dp"
                     android:clickable="true"
@@ -390,20 +459,26 @@
                             android:orientation="vertical">
 
                             <TextView
-                                android:text="MARKA/ ISKOR"
-                                android:textSize="14sp"
+                                android:text="MARKA / ISKOR"
                                 android:textStyle="bold"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="10sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp"
+                                android:paddingBottom="5dp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:paddingBottom="10sp"/>
+                                android:layout_width="match_parent"/>
 
                             <TextView
                                 android:text="Mga resulta ng pagsusulit."
-                                android:textSize="14sp"
                                 android:textColor="@color/black"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="8sp"
+                                android:autoSizeMaxTextSize="16sp"
+                                android:autoSizeStepGranularity="1sp"
                                 android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"/>
+                                android:layout_width="match_parent"/>
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -411,7 +486,25 @@
             </androidx.gridlayout.widget.GridLayout>
         </ScrollView>
 
-        <!--_____________________________________________ENDS OF BUTTONS____________________________________________-->
+<!--_____________________________________________ENDS OF BUTTONS____________________________________________-->
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--_____________________________________________Navitaion Bar____________________________________________-->
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_drawer_menu"
+        android:background="@color/four"
+        app:itemTextColor="@color/black"
+
+        />
+
+</androidx.drawerlayout.widget.DrawerLayout>
+
