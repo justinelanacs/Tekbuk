@@ -12,6 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tekbuk">
         <activity
+            android:name=".PaksaContent.KwentongbayanContent"
+            android:exported="false" />
+        <activity
+            android:name=".PaksaContent.TalumpatiContent"
+            android:exported="false" />
+        <activity
+            android:name=".PaksaContent.DagliContent"
+            android:exported="false" />
+        <activity
+            android:name=".PaksaContent.SanaysayContent"
+            android:exported="false" />
+        <activity
+            android:name=".PaksaContent.TulaContent"
+            android:exported="false" />
+        <activity
             android:name=".HomapageContent.MarkaPageActivity"
             android:exported="false" />
         <activity

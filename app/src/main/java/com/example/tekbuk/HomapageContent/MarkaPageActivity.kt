@@ -10,6 +10,8 @@ import com.example.tekbuk.R
 class MarkaPageActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Windows boarder format
         enableEdgeToEdge()
         setContentView(R.layout.marka_page)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
