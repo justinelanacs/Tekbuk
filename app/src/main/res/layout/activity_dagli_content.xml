@@ -7,4 +7,95 @@
     android:layout_height="match_parent"
     tools:context=".PaksaContent.DagliContent">
 
+    <TextView
+        android:id="@+id/level_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LEBEL 1: TALASALITAAN"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Panuto: Tukuyin ang kasing kahulugan ng mga salita. Hanapin ang sagot sa loob ng puzzle."
+        app:layout_constraintTop_toBottomOf="@id/level_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <include
+        android:id="@+id/crossword_dagli"
+        layout="@layout/crossword_dagli"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/instructions"
+        app:layout_constraintStart_toStartOf="parent"
+        app.layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/pahalang_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PAHALANG"
+        app:layout_constraintTop_toBottomOf="@id/crossword_dagli"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/pahalang_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1. pagtangkilik"
+        app:layout_constraintTop_toBottomOf="@id/pahalang_title"
+        app:layout_constraintStart_toStartOf="@id/pahalang_title"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/pahalang_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2. likhang sining"
+        app:layout_constraintTop_toBottomOf="@id/pahalang_1"
+        app:layout_constraintStart_toStartOf="@id/pahalang_1" />
+
+    <TextView
+        android:id="@+id/pahalang_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3. nag-aambag"
+        app:layout_constraintTop_toBottomOf="@id/pahalang_2"
+        app:layout_constraintStart_toStartOf="@id/pahalang_2" />
+
+    <TextView
+        android:id="@+id/pababa_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PABABA"
+        app:layout_constraintTop_toBottomOf="@id/pahalang_3"
+        app:layout_constraintStart_toStartOf="@id/pahalang_3"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/pababa_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1. Magkaisa"
+        app:layout_constraintTop_toBottomOf="@id/pababa_title"
+        app:layout_constraintStart_toStartOf="@id/pababa_title"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/pababa_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2. inspirasyon"
+        app:layout_constraintTop_toBottomOf="@id/pababa_1"
+        app:layout_constraintStart_toStartOf="@id/pababa_1" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
