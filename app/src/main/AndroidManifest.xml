@@ -5,12 +5,19 @@
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Tekbuk">
+        <activity
+            android:name=".HomapageContent.SettingsPage"
+            android:exported="false"
+            android:hardwareAccelerated="true"/>
         <activity
             android:name=".PaksaContent.KwentongbayanContent"
             android:exported="false" />
@@ -40,9 +47,6 @@
             android:exported="false" />
         <activity
             android:name=".HomapageContent.PaksaPageActivity"
-            android:exported="false" />
-        <activity
-            android:name=".HomapageContent.LayuninPageActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
