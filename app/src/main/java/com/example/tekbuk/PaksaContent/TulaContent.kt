@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.ScrollView
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,8 @@ class TulaContent : AppCompatActivity() {
     private lateinit var hiddenProgress: ProgressBar
     private lateinit var scrollView: ScrollView
     private lateinit var btnFinishReading: Button
+    private lateinit var textContent: TextView
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +39,13 @@ class TulaContent : AppCompatActivity() {
         hiddenProgress = findViewById(R.id.hiddenProgress)
         scrollView = findViewById(R.id.scrollView)
         btnFinishReading = findViewById(R.id.btnFinishReading)
+        textContent = findViewById(R.id.textContent)
+
+        // ✅ Load text file from res/raw
+        val inputStream = resources.openRawResource(R.raw.tulacontent)
+        val reader = inputStream.bufferedReader()
+        val fileText = reader.use { it.readText() }
+        textContent.text = fileText  // ← Set content to TextView
 
         hiddenProgress.max = 100
 

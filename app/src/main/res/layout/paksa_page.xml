@@ -8,23 +8,15 @@
     android:background="@color/one"
     tools:context=".HomapageContent.PaksaPageActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
-        android:text="v-1.0.0"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
                 <!--_____________________________________________BUTTONS____________________________________________-->
     <ScrollView
         android:id="@+id/scrollContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:foregroundGravity="center"
-        app:layout_constraintBottom_toTopOf="@+id/textView"
+        android:layout_margin="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,7 +24,7 @@
         <androidx.gridlayout.widget.GridLayout
             android:id="@+id/gridTula"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_gravity="center"
             app:alignmentMode="alignMargins"
             app:columnCount="1"
@@ -66,7 +58,6 @@
                         android:id="@+id/tulaProgress"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginTop="16dp"
                         app:indicatorColor="@color/five"
                         app:indicatorInset="8dp"
                         app:indicatorSize="40dp"
@@ -85,10 +76,10 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="@id/tulaProgress"
                         app:layout_constraintBottom_toBottomOf="@id/tulaProgress"
+                        app:layout_constraintEnd_toEndOf="@id/tulaProgress"
                         app:layout_constraintStart_toStartOf="@id/tulaProgress"
-                        app:layout_constraintEnd_toEndOf="@id/tulaProgress" />
+                        app:layout_constraintTop_toTopOf="@id/tulaProgress" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -128,20 +119,22 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="18sp"
-                            android:autoSizeMinTextSize="10sp"
+                            android:autoSizeMaxTextSize="20sp"
+                            android:autoSizeMinTextSize="13sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:paddingBottom="5dp"
+                            android:textSize="16sp"
                             android:text="TULA"
                             android:textColor="@color/black"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="240dp"
+                            android:layout_width="210dp"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="16sp"
-                            android:autoSizeMinTextSize="8sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="10sp"
+                            android:textSize="15sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:text="Isang akdang naglalahad ng kuru-kuro o pananaw ng may-akda tungkol sa isang paksa."
@@ -178,7 +171,6 @@
                         android:id="@+id/sanaysayProgress"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginTop="16dp"
                         app:indicatorColor="@color/five"
                         app:indicatorInset="8dp"
                         app:indicatorSize="40dp"
@@ -197,10 +189,10 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="@id/sanaysayProgress"
                         app:layout_constraintBottom_toBottomOf="@id/sanaysayProgress"
+                        app:layout_constraintEnd_toEndOf="@id/sanaysayProgress"
                         app:layout_constraintStart_toStartOf="@id/sanaysayProgress"
-                        app:layout_constraintEnd_toEndOf="@id/sanaysayProgress" />
+                        app:layout_constraintTop_toTopOf="@id/sanaysayProgress" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -240,8 +232,9 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="18sp"
-                            android:autoSizeMinTextSize="10sp"
+                            android:autoSizeMaxTextSize="20sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:textSize="16sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:paddingBottom="5dp"
@@ -250,10 +243,11 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="240dp"
+                            android:layout_width="210dp"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="16sp"
-                            android:autoSizeMinTextSize="8sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="10sp"
+                            android:textSize="15sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:text="Isang maikling akdang pampanitikan na naglalarawan ng isang pangyayari o karanasan sa iilang talata lamang."
@@ -289,7 +283,6 @@
                         android:id="@+id/dagliProgress"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginTop="16dp"
                         app:indicatorColor="@color/five"
                         app:indicatorInset="8dp"
                         app:indicatorSize="40dp"
@@ -308,10 +301,10 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="@id/dagliProgress"
                         app:layout_constraintBottom_toBottomOf="@id/dagliProgress"
+                        app:layout_constraintEnd_toEndOf="@id/dagliProgress"
                         app:layout_constraintStart_toStartOf="@id/dagliProgress"
-                        app:layout_constraintEnd_toEndOf="@id/dagliProgress" />
+                        app:layout_constraintTop_toTopOf="@id/dagliProgress" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -338,8 +331,9 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="18sp"
-                            android:autoSizeMinTextSize="10sp"
+                            android:autoSizeMaxTextSize="20sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:textSize="16sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:paddingBottom="5dp"
@@ -348,10 +342,11 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="240dp"
+                            android:layout_width="210dp"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="16sp"
-                            android:autoSizeMinTextSize="8sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="10sp"
+                            android:textSize="15sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:text="Isang maikling akdang pampanitikan na naglalarawan ng isang pangyayari o karanasan sa iilang talata lamang."
@@ -387,7 +382,6 @@
                         android:id="@+id/talumpatiProgress"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginTop="16dp"
                         app:indicatorColor="@color/five"
                         app:indicatorInset="8dp"
                         app:indicatorSize="40dp"
@@ -406,10 +400,10 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="@id/talumpatiProgress"
                         app:layout_constraintBottom_toBottomOf="@id/talumpatiProgress"
+                        app:layout_constraintEnd_toEndOf="@id/talumpatiProgress"
                         app:layout_constraintStart_toStartOf="@id/talumpatiProgress"
-                        app:layout_constraintEnd_toEndOf="@id/talumpatiProgress" />
+                        app:layout_constraintTop_toTopOf="@id/talumpatiProgress" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -436,8 +430,9 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="18sp"
-                            android:autoSizeMinTextSize="10sp"
+                            android:autoSizeMaxTextSize="20sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:textSize="16sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:paddingBottom="5dp"
@@ -446,10 +441,11 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="240dp"
+                            android:layout_width="210dp"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="16sp"
-                            android:autoSizeMinTextSize="8sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="10sp"
+                            android:textSize="15sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:text="Isang pahayag na binibigkas sa harap ng madla upang maglahad, manghikayat, o magbigay-impormasyon."
@@ -485,7 +481,6 @@
                         android:id="@+id/kwentongbayanProgress"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginTop="16dp"
                         app:indicatorColor="@color/five"
                         app:indicatorInset="8dp"
                         app:indicatorSize="40dp"
@@ -504,10 +499,10 @@
                         android:textColor="@color/black"
                         android:textSize="15sp"
                         android:textStyle="bold"
-                        app:layout_constraintTop_toTopOf="@id/kwentongbayanProgress"
                         app:layout_constraintBottom_toBottomOf="@id/kwentongbayanProgress"
+                        app:layout_constraintEnd_toEndOf="@id/kwentongbayanProgress"
                         app:layout_constraintStart_toStartOf="@id/kwentongbayanProgress"
-                        app:layout_constraintEnd_toEndOf="@id/kwentongbayanProgress" />
+                        app:layout_constraintTop_toTopOf="@id/kwentongbayanProgress" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -532,10 +527,11 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:layout_width="240dp"
+                            android:layout_width="210dp"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="18sp"
-                            android:autoSizeMinTextSize="10sp"
+                            android:autoSizeMaxTextSize="20sp"
+                            android:autoSizeMinTextSize="13sp"
+                            android:textSize="16sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:paddingBottom="5dp"
@@ -546,8 +542,9 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:autoSizeMaxTextSize="16sp"
-                            android:autoSizeMinTextSize="8sp"
+                            android:autoSizeMaxTextSize="18sp"
+                            android:autoSizeMinTextSize="10sp"
+                            android:textSize="15sp"
                             android:autoSizeStepGranularity="1sp"
                             android:autoSizeTextType="uniform"
                             android:text="Mga salaysay na nagmula sa bibig ng mga tao, na nagsasalamin ng kultura, paniniwala, at kaugalian ng isang lipunan."

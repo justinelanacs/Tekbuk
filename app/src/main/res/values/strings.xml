@@ -7,32 +7,21 @@
     <string name="tulaTitle">
             <h1>PIKIT NA KATOTOHANAN </h1>
     </string>
-    <string name="tulacontent">
-            Sa unang pagkikita, dala’y krus ng pag-asa.
-            Paniniwalang ipinakilala sa puso’y siyamg dusa.
-            Kandiling pananampalataya, sinunog, dinusta.
-            At inaliping walang-awa, Indyong walang sala.\n\n\n
 
-            Sa tindi ng pagdurusa mamamaya’y nag-alyansa
-            Ilustrado ang siyang nanguna, isinatitik ang pag-asa.
-            Lumikha ng mga obra na gumising sa madla.
-            Isiniwalat ang pagdurusa, bunga ng pang-aalispusta.\n\n\n
-
-            Mamamayan sa pagkakahimbing, pagkamakabayan ay nagising
-            Kasarinla’y ninais kamtin, lumaban nang palihim.
-            Munting tinig ng kalayaan patuloy na umalingawngaw
-            Taumbayang napipi sa katotohanan, sigaw ay nangibabaw.\n\n\n
-
-            Unti-unting bumangon, binuhay nang pag-ahon.
-            Pang-aalipin ng Espanyol, mga Pilipino ang pumutol.
-            Lumaban gamit ang dahas, nanindigan nang buong lakas.
-            Lumaya ang Pilipinas, sa pang-aaliping marahas.\n\n\n
-
-            Ang krus ng pag-asa, na may motibong kakaiba.
-            Ngayo’y pinalitan ng paglaya at tunay na pananampalataya.
-            Bagaman sa una ay sumpa, sa kasalukuya’y pagpapala.
-            Kahapon ang siyang tulay, sa pagkamulat ng madla\n\n\n
-
-
+    <string name="sanaysayTitle">
+            <h1>SUMANlangit Nawa</h1>
     </string>
+
+    <string name="dagliTitle">
+            <h1>Foul</h1>
+    </string>
+
+    <string name="talumpatiTitle">
+            <h1>ATIN TO!</h1>
+    </string>
+
+    <string name="kwentongbayanTitle">
+            <h1>ANG ALAMAT NG MANGUMIT</h1>
+    </string>
+
 </resources>

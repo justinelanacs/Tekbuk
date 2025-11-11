@@ -1,10 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/fourpointfive"
     tools:context=".PaksaContent.DagliContent">
+
+    <ProgressBar
+        android:id="@+id/hiddenProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/scrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="top"
+            android:gravity="center"
+            android:padding="16dp">
+
+            <!-- Main Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DAGLI"
+                android:textColor="@color/black"
+                android:layout_marginTop="20dp"
+                android:textSize="40sp"
+                android:gravity="center"
+                android:layout_marginBottom="50dp"
+                android:elevation="6dp" />
+
+            <!-- Subtitle/Text -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dagliTitle"
+                android:textColor="@color/fourpointfive"
+                android:background="@drawable/paksacontentborder"
+                android:textSize="23sp"
+                android:padding="10dp"
+                android:gravity="center"
+                android:layout_marginBottom="20dp"
+                android:elevation="2dp" />
+
+            <!-- Main Text Content -->
+            <TextView
+                android:id="@+id/textContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/fourpointfive"
+                android:background="@drawable/paksacontentborder"
+                android:textSize="20sp"
+                android:layout_marginBottom="20dp"
+                android:elevation="2dp"
+                android:lineSpacingExtra="5dp"
+                android:justificationMode="inter_word"
+                android:padding="25dp" />
+
+            <!-- Finish Reading Button -->
+            <Button
+                android:id="@+id/btnFinishReading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tapusin ang Pagbasa"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="60dp"
+                android:backgroundTint="#493400"
+                android:textColor="@color/fourpointfive"
+                android:textStyle="bold"
+                android:padding="12dp"
+                android:elevation="8dp" /> <!-- slightly higher elevation for button -->
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
