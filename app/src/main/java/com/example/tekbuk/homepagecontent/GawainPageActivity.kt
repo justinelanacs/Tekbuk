@@ -1,4 +1,4 @@
-package com.example.tekbuk.HomapageContent
+package com.example.tekbuk.homepagecontent
 
 import android.app.Activity
 import android.content.Context
