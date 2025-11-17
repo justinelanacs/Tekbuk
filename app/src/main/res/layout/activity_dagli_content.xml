@@ -64,20 +64,21 @@
                 android:elevation="2dp" />
 
             <!-- Main Text Content -->
+
+            <!-- Finish Reading Button -->
             <TextView
                 android:id="@+id/textContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/fourpointfive"
-                android:background="@drawable/paksacontentborder"
-                android:textSize="20sp"
                 android:layout_marginBottom="20dp"
+                android:background="@drawable/paksacontentborder"
                 android:elevation="2dp"
-                android:lineSpacingExtra="5dp"
                 android:justificationMode="inter_word"
-                android:padding="25dp" />
+                android:lineSpacingExtra="5dp"
+                android:padding="25dp"
+                android:textColor="@color/fourpointfive"
+                android:textSize="20sp" />
 
-            <!-- Finish Reading Button -->
             <Button
                 android:id="@+id/btnFinishReading"
                 android:layout_width="match_parent"

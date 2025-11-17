@@ -12,12 +12,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="16dp"
         android:orientation="vertical">
 
-        <!-- === DAGLI === -->
+        <!-- === TULA === -->
         <include layout="@layout/item_gawain_card"
-            android:id="@+id/cardDagli"
-            android:tag="dagli"
+            android:id="@+id/cardTula"
+            android:tag="tula"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="12dp" />
@@ -30,10 +31,10 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="12dp" />
 
-        <!-- === TULA === -->
+        <!-- === DAGLI === -->
         <include layout="@layout/item_gawain_card"
-            android:id="@+id/cardTula"
-            android:tag="tula"
+            android:id="@+id/cardDagli"
+            android:tag="dagli"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="12dp" />

@@ -15,9 +15,54 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tekbuk">
         <activity
+            android:name=".GawainContent.KWENTONGBAYAN_level3"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.KWENTONGBAYAN_level2"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.KWENTONGBAYAN_level1"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.TALUMPATI_level3"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.TALUMPATI_level2"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.TALUMPATI_level1"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.DAGLI_level3"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.DAGLI_level2"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.DAGLI_level1"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.SANAYSAY_level3"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.SANAYSAY_level2"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.SANAYSAY_level1"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.TULA_level3"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.TULA_level2"
+            android:exported="false" />
+        <activity
+            android:name=".GawainContent.TULA_level1"
+            android:exported="false" />
+        <activity
             android:name=".HomapageContent.SettingsPage"
             android:exported="false"
-            android:hardwareAccelerated="true"/>
+            android:hardwareAccelerated="true" />
         <activity
             android:name=".PaksaContent.KwentongbayanContent"
             android:exported="false" />
