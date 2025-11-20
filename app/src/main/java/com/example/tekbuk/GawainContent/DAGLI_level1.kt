@@ -39,17 +39,17 @@ class DAGLI_level1 : AppCompatActivity() {
     )
 
     private val words = listOf(
-        Word("PAGDURUSA", 3, 4, "H", "Paghihirap."),
-        Word("MARAHAS", 5, 0, "H", "Malupit."),
-        Word("ISINATITIK", 7, 5, "H", "Isinulat."),
-        Word("KASARINLAN", 2, 5, "V", "Kalayaan."),
-        Word("KANDILI", 5, 8, "V", "Dala-dala.")
+        Word("MINTIS", 3, 0, "H", "Hindi pagtama sa bagay na tinutukoy."),
+        Word("UMALINGAWNGAW", 7, 1, "H", "Paulit-ulit na tunog."),
+        Word("ABOTTANAW", 0, 3, "V", "Naabot ng tingin."),
+        Word("DISMAYADO", 6, 5, "V", "Pagkabigo sa di inaasahang resulta."),
+        Word("IGLAP", 6, 7, "V", "Maikling sandali.")
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_dagli_level1)
+        setContentView(R.layout.activity_tula_level1)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -139,7 +139,7 @@ class DAGLI_level1 : AppCompatActivity() {
                     val currentWord = word
                     setOnClickListener {
                         if (!timerStarted) {
-                            startTimer(1 * 60 * 1000)
+                            startTimer(10 * 60 * 1000)
                             timerStarted = true
                         }
                         showWordDialog(currentWord)
@@ -221,12 +221,12 @@ class DAGLI_level1 : AppCompatActivity() {
     }
 
     private fun finishLevel() {
-        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("DAGLI_level1", MODE_PRIVATE)
         val alreadyCompleted = sharedPref.getBoolean("level_completed", false)
 
         // Set result for GawainPageActivity
         val resultIntent = Intent().apply {
-            putExtra("paksa_id", "tula")
+            putExtra("paksa_id", "dagli")
             putExtra("level_completed", 1)
             putExtra("score", score)
         }
@@ -245,17 +245,17 @@ class DAGLI_level1 : AppCompatActivity() {
 
     // --- Persistence ---
     private fun saveWordState(word: Word) {
-        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("DAGLI_level1", MODE_PRIVATE)
         sharedPref.edit().putBoolean("word_${word.text}_completed", true).apply()
     }
 
     private fun saveScoreState() {
-        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("DAGLI_level1", MODE_PRIVATE)
         sharedPref.edit().putInt("score", score).apply()
     }
 
     private fun loadSavedState() {
-        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("DAGLI_level1", MODE_PRIVATE)
         score = sharedPref.getInt("score", 0)
         scoreText.text = if (score > 0) "Score: $score / 10" else ""
 

@@ -139,7 +139,7 @@ class TULA_level1 : AppCompatActivity() {
                     val currentWord = word
                     setOnClickListener {
                         if (!timerStarted) {
-                            startTimer(1 * 60 * 1000)
+                            startTimer(10 * 60 * 1000)
                             timerStarted = true
                         }
                         showWordDialog(currentWord)
