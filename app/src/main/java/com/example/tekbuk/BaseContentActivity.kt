@@ -15,45 +15,59 @@ import com.example.tekbuk.R
 
 abstract class BaseContentActivity : AppCompatActivity() {
 
-    // Views shared by all content pages
+    // Shared Views
     protected lateinit var hiddenProgress: ProgressBar
     protected lateinit var scrollView: ScrollView
     protected lateinit var btnFinishReading: Button
     protected lateinit var textContent: TextView
 
+    // Newly added views for dynamic title & subtitle
+    protected lateinit var textTitle: TextView
+    protected lateinit var textSubtitle: TextView
+
     companion object {
         var scrollListener: ScrollProgressListener? = null
     }
 
-    // Each subclass must provide its own raw resource file
+    // Subclasses MUST provide raw content file, title, and subtitle
     abstract val contentRawRes: Int
+    abstract val pageTitle: String
+    abstract val pageSubtitle: String
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_tula_content) // All content pages share this layout
+        setContentView(R.layout.activity_tula_content)
 
-        // Adjust padding for system bars
+        // Apply edge padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Initialize views
+        // Initialize main views
         hiddenProgress = findViewById(R.id.hiddenProgress)
         scrollView = findViewById(R.id.scrollView)
         btnFinishReading = findViewById(R.id.btnFinishReading)
         textContent = findViewById(R.id.textContent)
 
-        // Load content from raw resource
+        // Initialize new Title and Subtitle (YOU ADDED THESE IDs)
+        textTitle = findViewById(R.id.Title)
+        textSubtitle = findViewById(R.id.Subtitle)
+
+        // APPLY TITLE & SUBTITLE DYNAMICALLY
+        textTitle.text = pageTitle
+        textSubtitle.text = pageSubtitle
+
+        // Load TEXT CONTENT from raw .txt
         val inputStream = resources.openRawResource(contentRawRes)
         textContent.text = inputStream.bufferedReader().use { it.readText() }
 
         hiddenProgress.max = 100
 
-        // Update progress as user scrolls
+        // Scroll progress logic
         scrollView.viewTreeObserver.addOnScrollChangedListener {
             val scrollY = scrollView.scrollY
             val contentHeight = scrollView.getChildAt(0).height
@@ -64,15 +78,18 @@ abstract class BaseContentActivity : AppCompatActivity() {
                 val progress = (scrollY * 100f / totalScroll).toInt().coerceIn(0, 100)
                 hiddenProgress.progress = progress
 
-                // Notify PaksaPageActivity about scroll progress
-                scrollListener?.onProgressUpdate(intent.getIntExtra("paksa_index", -1), progress)
+                // Notify PaksaPageActivity
+                scrollListener?.onProgressUpdate(
+                    intent.getIntExtra("paksa_index", -1),
+                    progress
+                )
             }
         }
 
-        // Finish reading button
+        // Finish Reading Button
         btnFinishReading.setOnClickListener { finish() }
 
-        // Handle back button
+        // Back Button Handling
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()

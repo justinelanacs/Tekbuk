@@ -35,7 +35,6 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_gravity="top"
-            android:gravity="center"
             android:padding="16dp">
 
             <!-- Main Title -->

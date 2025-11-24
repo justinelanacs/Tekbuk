@@ -3,5 +3,9 @@ package com.example.tekbuk.PaksaContent
 import com.example.tekbuk.R
 
 class KwentongbayanContent : BaseContentActivity() {
-    override val contentRawRes: Int = R.raw.kwentongbayancontent
+
+    override val contentRawRes: Int = R.raw.tulacontent
+
+    override val pageTitle: String = "KWENTONG BAYAN"
+    override val pageSubtitle: String = "ANG ALAMAT NG MANGUMIT"
 }
