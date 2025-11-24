@@ -1,120 +1,97 @@
 package com.example.tekbuk.HomapageContent
 
-import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
+import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.tekbuk.PaksaContent.*
+import androidx.viewpager2.widget.ViewPager2
 import com.example.tekbuk.R
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.example.tekbuk.adapter.PaksaAdapter
+import com.example.tekbuk.model.PaksaItem
+import com.example.tekbuk.PaksaContent.*
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
+class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
 
-class PaksaPageActivity : AppCompatActivity() {
+    private lateinit var dotIndicator: TabLayout
+    private lateinit var viewPager: ViewPager2
+    private lateinit var paksaItems: MutableList<PaksaItem>
+    private lateinit var adapter: PaksaAdapter
 
-    private lateinit var tulaProgress: CircularProgressIndicator
-    private lateinit var sanaysayProgress: CircularProgressIndicator
-    private lateinit var dagliProgress: CircularProgressIndicator
-    private lateinit var talumpatiProgress: CircularProgressIndicator
-    private lateinit var kwentongBayanProgress: CircularProgressIndicator
-
-    private lateinit var tulaPercent: TextView
-    private lateinit var sanaysayPercent: TextView
-    private lateinit var dagliPercent: TextView
-    private lateinit var talumpatiPercent: TextView
-    private lateinit var kwentongBayanPercent: TextView
-
-    // ✅ Register activity results for each content page
-    private val tulaLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val progress = result.data?.getIntExtra("scroll_progress", 0) ?: 0
-            updateProgress(tulaProgress, tulaPercent, progress)
-        }
-    }
-
-    private val sanaysayLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val progress = result.data?.getIntExtra("scroll_progress", 0) ?: 0
-            updateProgress(sanaysayProgress, sanaysayPercent, progress)
-        }
-    }
-
-    private val dagliLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val progress = result.data?.getIntExtra("scroll_progress", 0) ?: 0
-            updateProgress(dagliProgress, dagliPercent, progress)
-        }
-    }
-
-    private val talumpatiLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val progress = result.data?.getIntExtra("scroll_progress", 0) ?: 0
-            updateProgress(talumpatiProgress, talumpatiPercent, progress)
-        }
-    }
-
-    private val kwentongBayanLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val progress = result.data?.getIntExtra("scroll_progress", 0) ?: 0
-            updateProgress(kwentongBayanProgress, kwentongBayanPercent, progress)
-        }
-    }
+    // Helper function to read raw text files
+    private fun readRawText(resId: Int): String =
+        resources.openRawResource(resId).bufferedReader().use { it.readText() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Windows boarder format
         enableEdgeToEdge()
         setContentView(R.layout.paksa_page)
+
+        // Adjust for system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
+        // Find views
+        viewPager = findViewById(R.id.paksaCarousel)
+        dotIndicator = findViewById(R.id.dotIndicator)
 
-        // ✅ Connect progress bars and text views
-        tulaProgress = findViewById(R.id.tulaProgress)
-        sanaysayProgress = findViewById(R.id.sanaysayProgress)
-        dagliProgress = findViewById(R.id.dagliProgress)
-        talumpatiProgress = findViewById(R.id.talumpatiProgress)
-        kwentongBayanProgress = findViewById(R.id.kwentongbayanProgress) // fixed typo
+        // Initialize paksa items with raw text descriptions
+        paksaItems = mutableListOf(
+            PaksaItem("TULA", readRawText(R.raw.tula_desc), R.drawable.tula, 0),
+            PaksaItem("SANAYSAY", readRawText(R.raw.sanaysay_desc), R.drawable.sanaysay, 0),
+            PaksaItem("DAGLI", readRawText(R.raw.dagli_desc), R.drawable.dagli, 0),
+            PaksaItem("TALUMPATI", readRawText(R.raw.talumpati_desc), R.drawable.talumpati, 0),
+            PaksaItem("KWENTONG BAYAN", readRawText(R.raw.kwentongbayan_desc), R.drawable.kwentongbayan, 0)
+        )
 
-        tulaPercent = findViewById(R.id.tulaprogressPercent)
-        sanaysayPercent = findViewById(R.id.sanaysayprogressPercent)
-        dagliPercent = findViewById(R.id.dagliprogressPercent)
-        talumpatiPercent = findViewById(R.id.talumpatiprogressPercent)
-        kwentongBayanPercent = findViewById(R.id.kwentongbayanprogressPercent)
+        // Setup adapter
+        adapter = PaksaAdapter(this, paksaItems)
+        viewPager.adapter = adapter
+        viewPager.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        viewPager.offscreenPageLimit = 3
+        viewPager.clipToPadding = false
+        viewPager.clipChildren = false
+        viewPager.getChildAt(0).overScrollMode = ViewPager2.OVER_SCROLL_NEVER
 
-        // ✅ Open each content page
-        findViewById<MaterialCardView>(R.id.cardPaksa).setOnClickListener {
-            tulaLauncher.launch(Intent(this, TulaContent::class.java))
+        // Page transform (spacing + scale effect)
+        val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.viewpager_page_margin)
+        val offsetPx = resources.getDimensionPixelOffset(R.dimen.viewpager_offset)
+        viewPager.setPadding(offsetPx, 0, offsetPx, 0)
+        viewPager.setPageTransformer { page, position ->
+            val offset = position * -(0 * offsetPx + pageMarginPx)
+            page.translationX = offset
+            val scale = 0.85f + (1 - kotlin.math.abs(position)) * 0.15f
+            page.scaleY = scale
         }
 
-        findViewById<MaterialCardView>(R.id.cardSanaysay).setOnClickListener {
-            sanaysayLauncher.launch(Intent(this, SanaysayContent::class.java))
-        }
+        // Attach TabLayout as dot indicator with spacing
+        TabLayoutMediator(dotIndicator, viewPager) { tab, _ ->
+            val tabView = tab.view
+            val params = tabView.layoutParams as? ViewGroup.MarginLayoutParams
+            params?.let {
+                val marginDp = 4  // margin in dp
+                val marginPx = (marginDp * resources.displayMetrics.density).toInt()
+                it.marginStart = marginPx
+                it.marginEnd = marginPx
+                tabView.layoutParams = it
+            }
+        }.attach()
 
-        findViewById<MaterialCardView>(R.id.cardDagli).setOnClickListener {
-            dagliLauncher.launch(Intent(this, DagliContent::class.java))
-        }
-
-        findViewById<MaterialCardView>(R.id.cardTalumpati).setOnClickListener {
-            talumpatiLauncher.launch(Intent(this, TalumpatiContent::class.java))
-        }
-
-        findViewById<MaterialCardView>(R.id.cardKwentongbayan).setOnClickListener {
-            kwentongBayanLauncher.launch(Intent(this, KwentongbayanContent::class.java))
-        }
+        // Set scroll listener for live progress updates
+        BaseContentActivity.scrollListener = this
     }
 
-    // ✅ Helper to smoothly update progress
-    private fun updateProgress(progressBar: CircularProgressIndicator, text: TextView, value: Int) {
-        progressBar.setProgress(value, true)
-        text.text = "$value%"
+    // Scroll progress callback
+    override fun onProgressUpdate(index: Int, progress: Int) {
+        if (index in paksaItems.indices) {
+            paksaItems[index].progress = progress
+            adapter.notifyItemChanged(index)
+        }
     }
 }
