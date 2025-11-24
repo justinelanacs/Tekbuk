@@ -2,69 +2,330 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     app:cardCornerRadius="16dp"
     app:cardElevation="6dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/black"
+
     android:backgroundTint="@color/fourpointfive">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:orientation="vertical"
+        android:padding="10dp">
 
-
-        <LinearLayout
+        <!-- Paksa Title -->
+        <TextView
+            android:id="@+id/paksaTitle"
             android:layout_width="match_parent"
-            android:layout_height="210dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:text="Paksa"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
 
-            <TextView
-                android:id="@+id/paksaTitle"
+        <!-- LEVEL 1 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnLevel1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:strokeWidth="1dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/one">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="Paksa"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+                android:padding="16dp">
 
-            <Button
-                android:id="@+id/btnLevel1"
+                <TextView
+                    android:id="@+id/iconEmoji1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="😊"
+                    android:textColor="@android:color/white"
+                    android:textSize="32sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <LinearLayout
+                    android:id="@+id/levelTexts1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/iconEmoji1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/textLevel1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Level 1"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"/>
+
+                    <TextView
+                        android:id="@+id/textDifficulty1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MADALI"
+                        android:textColor="@color/four"
+                        android:textSize="16sp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/timerIcon1"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/timer_icon"
+                            app:tint="@color/fourpointfive"/>
+
+                        <TextView
+                            android:id="@+id/textMinutes1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="10 minuto"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/star1_1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/starshade_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/white"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- LEVEL 2 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnLevel2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:strokeWidth="1dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/one">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:backgroundTint="@color/two"
-                android:text="Level 1 - Crossword"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                android:padding="16dp">
 
-            <Button
-                android:id="@+id/btnLevel2"
+                <TextView
+                    android:id="@+id/iconEmoji2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🤔"
+                    android:textColor="@android:color/white"
+                    android:textSize="32sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <LinearLayout
+                    android:id="@+id/levelTexts2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/iconEmoji2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/textLevel2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Level 2"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"/>
+
+                    <TextView
+                        android:id="@+id/textDifficulty2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="KATAMTAMANG DALI"
+                        android:textColor="@color/four"
+                        android:textSize="16sp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/timerIcon2"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/timer_icon"
+                            app:tint="@color/fourpointfive"/>
+
+                        <TextView
+                            android:id="@+id/textMinutes2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="10 minuto"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/star2_1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/starblank_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/white"/>
+
+                <ImageView
+                    android:id="@+id/star2_2"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/starblank_icon"
+                    android:layout_marginRight="3dp"
+                    app:layout_constraintEnd_toStartOf="@+id/star2_1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/white"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- LEVEL 3 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnLevel3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:strokeWidth="1dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@color/one">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:backgroundTint="@color/two"
-                android:enabled="false"
-                android:text="Level 2 - Quiz"
-                android:textSize="16sp"
-                android:textColor="@color/black" />
+                android:padding="16dp">
 
-            <Button
-                android:id="@+id/btnLevel3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:backgroundTint="@color/two"
-                android:enabled="false"
-                android:textSize="16sp"
-                android:text="Level 3 - Repleksyon"
-                android:textColor="@color/black" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/iconEmoji3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="😅"
+                    android:textColor="@android:color/white"
+                    android:textSize="32sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <LinearLayout
+                    android:id="@+id/levelTexts3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/iconEmoji3"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <TextView
+                        android:id="@+id/textLevel3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Level 3"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"/>
+
+                    <TextView
+                        android:id="@+id/textDifficulty3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MAHIRAP"
+                        android:textColor="@color/four"
+                        android:textSize="16sp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:id="@+id/timerIcon3"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/timer_icon"
+                            app:tint="@color/fourpointfive"/>
+
+                        <TextView
+                            android:id="@+id/textMinutes3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:text="10 minuto"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/star3_1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/starblank_icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/white"/>
+
+                <ImageView
+                    android:id="@+id/star3_2"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/starblank_icon"
+                    android:layout_marginRight="3dp"
+                    app:layout_constraintEnd_toStartOf="@+id/star3_1"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/white"/>
+
+                <ImageView
+                    android:id="@+id/star3_3"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/starblank_icon"
+                    android:layout_marginRight="3dp"
+                    app:layout_constraintEnd_toStartOf="@+id/star3_2"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:tint="@color/white"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

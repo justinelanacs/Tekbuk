@@ -43,7 +43,7 @@
                 app:cardBackgroundColor="#B3FBF9F1"
                 app:cardCornerRadius="16dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="@color/gray"
+                app:strokeColor="@color/black"
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -156,7 +156,7 @@
                 app:cardBackgroundColor="#B3FBF9F1"
                 app:cardCornerRadius="16dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="@color/gray"
+                app:strokeColor="@color/black"
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -269,7 +269,7 @@
                 app:cardBackgroundColor="#B3FBF9F1"
                 app:cardCornerRadius="16dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="@color/gray"
+                app:strokeColor="@color/black"
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -368,7 +368,7 @@
                 app:cardBackgroundColor="#B3FBF9F1"
                 app:cardCornerRadius="16dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="@color/gray"
+                app:strokeColor="@color/black"
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -467,7 +467,7 @@
                 app:cardBackgroundColor="#B3FBF9F1"
                 app:cardCornerRadius="16dp"
                 app:layout_columnWeight="1"
-                app:strokeColor="@color/gray"
+                app:strokeColor="@color/black"
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout

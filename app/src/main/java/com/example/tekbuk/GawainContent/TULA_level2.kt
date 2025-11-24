@@ -17,7 +17,7 @@ import com.example.tekbuk.R
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
-class TULA_level2 : AppCompatActivity() {
+class  TULA_level2 : AppCompatActivity() {
 
     private val paksaId = "tula"
     private val levelCompleted = 2
