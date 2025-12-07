@@ -60,7 +60,7 @@
             android:name=".GawainContent.TULA_level1"
             android:exported="false" />
         <activity
-            android:name=".HomapageContent.SettingsPage"
+            android:name=".HomepageContent.SettingsPage"
             android:exported="false"
             android:hardwareAccelerated="true" />
         <activity
@@ -79,19 +79,19 @@
             android:name=".PaksaContent.TulaContent"
             android:exported="false" />
         <activity
-            android:name=".HomapageContent.MarkaPageActivity"
+            android:name=".HomepageContent.MarkaPageActivity"
             android:exported="false" />
         <activity
-            android:name=".HomapageContent.RepleksyonPageActivity"
+            android:name=".HomepageContent.RepleksyonPageActivity"
             android:exported="false" />
         <activity
-            android:name=".HomapageContent.PagtatayaPageActivity"
+            android:name=".HomepageContent.PagtatayaPageActivity"
             android:exported="false" />
         <activity
-            android:name=".HomapageContent.GawainPageActivity"
+            android:name=".HomepageContent.GawainPageActivity"
             android:exported="false" />
         <activity
-            android:name=".HomapageContent.PaksaPageActivity"
+            android:name=".HomepageContent.PaksaPageActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

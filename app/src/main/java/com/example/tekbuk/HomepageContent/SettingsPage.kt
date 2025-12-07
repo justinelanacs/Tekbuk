@@ -1,4 +1,4 @@
-package com.example.tekbuk.HomapageContent
+package com.example.tekbuk.HomepageContent
 
 import android.app.AlertDialog
 import android.os.Bundle

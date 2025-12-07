@@ -2,6 +2,7 @@ package com.example.tekbuk.GawainContent
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -29,6 +30,7 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
     private var score = 0
     private val gridSize = 15
     private val cells = Array(gridSize) { arrayOfNulls<EditText>(gridSize) }
+    private var levelFinished = false
 
     data class Word(
         val text: String,
@@ -58,15 +60,11 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
         }
 
         timerText = findViewById(R.id.timer)
-        timerText.text = "00:00"
-
         scoreText = findViewById(R.id.score)
-        scoreText.text = ""
-
         crosswordGrid = findViewById(R.id.crosswordGrid)
 
         buildGrid()
-        loadSavedState() // Restore previous answers and score
+        loadSavedState()
     }
 
     private fun startTimer(timeInMillis: Long) {
@@ -80,17 +78,15 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
             override fun onFinish() {
                 timerText.text = "Time's up!"
                 disableAllCells()
-                finishLevel()
+                if (!levelFinished) {
+                    finishLevel()
+                }
             }
         }.start()
     }
 
     private fun disableAllCells() {
-        for (row in 0 until gridSize) {
-            for (col in 0 until gridSize) {
-                cells[row][col]?.isEnabled = false
-            }
-        }
+        cells.forEach { row -> row.forEach { it?.isEnabled = false } }
     }
 
     private fun buildGrid() {
@@ -103,26 +99,26 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
 
         for (row in 0 until gridSize) {
             for (col in 0 until gridSize) {
-                val cell = EditText(this)
-                val params = GridLayout.LayoutParams().apply {
-                    width = px
-                    height = px
-                    setMargins(1, 1, 1, 1)
-                    rowSpec = GridLayout.spec(row)
-                    columnSpec = GridLayout.spec(col)
+                val cell = EditText(this).apply {
+                    layoutParams = GridLayout.LayoutParams().apply {
+                        width = px
+                        height = px
+                        setMargins(1, 1, 1, 1)
+                        rowSpec = GridLayout.spec(row)
+                        columnSpec = GridLayout.spec(col)
+                    }
+                    setBackgroundColor(Color.DKGRAY)
+                    isEnabled = false
+                    filters = arrayOf(InputFilter.LengthFilter(1))
+                    textSize = 12f
+                    setTextColor(Color.BLACK)
+                    gravity = android.view.Gravity.CENTER
+                    isSingleLine = true
+                    isFocusable = false
+                    isFocusableInTouchMode = false
+                    isCursorVisible = false
+                    setPadding(0, 0, 0, 0)
                 }
-                cell.layoutParams = params
-                cell.setBackgroundColor(Color.DKGRAY)
-                cell.isEnabled = false
-                cell.filters = arrayOf(InputFilter.LengthFilter(1))
-                cell.textSize = sizeDp * 0.7f
-                cell.setTextColor(Color.BLACK)
-                cell.gravity = android.view.Gravity.CENTER
-                cell.isSingleLine = true
-                cell.isFocusable = false
-                cell.isFocusableInTouchMode = false
-                cell.isCursorVisible = false
-                cell.setPadding(0, 0, 0, 0)
                 crosswordGrid.addView(cell)
                 cells[row][col] = cell
             }
@@ -133,17 +129,15 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
                 val r = if (word.direction == "H") word.startRow else word.startRow + i
                 val c = if (word.direction == "H") word.startCol + i else word.startCol
                 if (r !in 0 until gridSize || c !in 0 until gridSize) continue
-                val cell = cells[r][c]
-                cell?.apply {
+                cells[r][c]?.apply {
                     setBackgroundColor(Color.WHITE)
                     isEnabled = true
-                    val currentWord = word
                     setOnClickListener {
                         if (!timerStarted) {
                             startTimer(10 * 60 * 1000)
                             timerStarted = true
                         }
-                        showWordDialog(currentWord)
+                        showWordDialog(word)
                     }
                 }
             }
@@ -155,18 +149,15 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(50, 40, 50, 10)
         }
-
         val clueView = TextView(this).apply {
             text = word.clue
             textSize = 16f
             setPadding(0, 0, 0, 20)
         }
-
         val input = EditText(this).apply {
             hint = "Enter your answer"
             isSingleLine = true
         }
-
         layout.addView(clueView)
         layout.addView(input)
 
@@ -176,7 +167,7 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
             .setPositiveButton("Submit") { dialog, _ ->
                 val answer = input.text.toString().uppercase()
                 if (answer == word.text) {
-                    fillWord(word, saveScore = true)
+                    fillWord(word, isNewAnswer = true)
                     Toast.makeText(this, "✅ Correct!", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "❌ Wrong! Try again.", Toast.LENGTH_SHORT).show()
@@ -187,82 +178,84 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
             .show()
     }
 
-    private fun fillWord(word: Word, saveScore: Boolean) {
+    private fun fillWord(word: Word, isNewAnswer: Boolean) {
         for (i in word.text.indices) {
             val r = if (word.direction == "H") word.startRow else word.startRow + i
             val c = if (word.direction == "H") word.startCol + i else word.startCol
-            val cell = cells[r][c]
-            cell?.apply {
+            cells[r][c]?.apply {
                 setText(word.text[i].toString())
                 isEnabled = false
                 setBackgroundColor(Color.parseColor("#C8E6C9"))
             }
         }
 
-        if (saveScore) {
-            score += 2
+        if (isNewAnswer) {
             saveWordState(word)
-            saveScoreState()
-        }
-
-        if (words.all { wordCompleted(it) }) {
-            countDownTimer?.cancel()
-            finishLevel()
+            recalculateScore()
+            if (words.all { wordCompleted(it) } && !levelFinished) {
+                countDownTimer?.cancel()
+                finishLevel()
+            }
         }
     }
 
     private fun wordCompleted(word: Word): Boolean {
-        for (i in word.text.indices) {
-            val r = if (word.direction == "H") word.startRow else word.startRow + i
-            val c = if (word.direction == "H") word.startCol + i else word.startCol
-            val cell = cells[r][c] ?: return false
-            if (cell.text.toString() != word.text[i].toString()) return false
-        }
-        return true
+        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
+        return sharedPref.getBoolean("word_${word.text}_completed", false)
     }
 
     private fun finishLevel() {
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_level1", MODE_PRIVATE)
-        val alreadyCompleted = sharedPref.getBoolean("level_completed", false)
+        if (levelFinished) return
+        levelFinished = true
+        recalculateScore()
+        saveFinalScore("KWENTONG_BAYAN", 1, score)
 
-        // Set result for GawainPageActivity
         val resultIntent = Intent().apply {
-            putExtra("paksa_id", "kwentongbayan")
+            putExtra("paksa_id", "kwentong_bayan")
             putExtra("level_completed", 1)
             putExtra("score", score)
         }
         setResult(Activity.RESULT_OK, resultIntent)
 
-        // Show dialog only if not already completed
-        if (!alreadyCompleted) {
-            sharedPref.edit().putBoolean("level_completed", true).apply()
-            AlertDialog.Builder(this)
-                .setTitle("Level Completed!")
-                .setMessage("Your final score is $score / 10")
-                .setPositiveButton("OK") { _, _ -> finish() }
-                .show()
-        }
+        AlertDialog.Builder(this)
+            .setTitle("Level Completed!")
+            .setMessage("Your final score is $score / 10")
+            .setPositiveButton("OK") { _, _ -> finish() }
+            .setCancelable(false)
+            .show()
     }
 
-    // --- Persistence ---
+    private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
+        val prefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
+        val key = "${topic.uppercase()}_LEVEL_${level}"
+        prefs.edit().putInt(key, scoreToSave).apply()
+    }
+
     private fun saveWordState(word: Word) {
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_level1", MODE_PRIVATE)
+        // ⭐ [FIX] Use the correct SharedPreferences file name to match the other functions
+        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
         sharedPref.edit().putBoolean("word_${word.text}_completed", true).apply()
     }
 
-    private fun saveScoreState() {
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_level1", MODE_PRIVATE)
-        sharedPref.edit().putInt("score", score).apply()
+    private fun loadSavedState() {
+        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
+        for (word in words) {
+            if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
+                fillWord(word, isNewAnswer = false)
+            }
+        }
+        recalculateScore()
     }
 
-    private fun loadSavedState() {
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_level1", MODE_PRIVATE)
-        score = sharedPref.getInt("score", 0)
-        scoreText.text = if (score > 0) "Score: $score / 10" else ""
-
+    private fun recalculateScore() {
+        var currentScore = 0
+        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
         for (word in words) {
-            val completed = sharedPref.getBoolean("word_${word.text}_completed", false)
-            if (completed) fillWord(word, saveScore = false)
+            if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
+                currentScore += 2
+            }
         }
+        score = currentScore
+        scoreText.text = if (score > 0) "Score: $score / 10" else ""
     }
 }
