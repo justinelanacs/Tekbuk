@@ -16,20 +16,23 @@
         android:id="@+id/headerCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="55dp"
+        android:layout_marginBottom="16dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/mainbutton_bg"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/questionCounterText"
@@ -46,14 +49,15 @@
                 android:id="@+id/timerText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:drawablePadding="8dp"
                 android:text="01:30:00"
                 android:textColor="@color/red"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:drawablePadding="8dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
 
     <!-- Scrollable Question Area -->
     <ScrollView
@@ -61,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintTop_toBottomOf="@id/headerCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -142,28 +147,28 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/questionScrollView">
 
         <Button
             android:id="@+id/backButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginEnd="10dp"
-            android:text="BUMALIK"
+            android:layout_weight="1"
             android:backgroundTint="@color/one"
+            android:text="BUMALIK"
             android:textColor="@color/white" />
 
         <Button
             android:id="@+id/nextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="10dp"
-            android:text="SUNOD"
+            android:layout_weight="1"
             android:backgroundTint="@color/one"
+            android:text="SUNOD"
             android:textColor="@color/white" />
 
     </LinearLayout>
