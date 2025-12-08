@@ -7,19 +7,29 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.tekbuk.databinding.ActivitySettingsPageBinding
-
+import com.example.tekbuk.R
+import android.widget.Button
+import android.widget.TextView
 class SettingsPage : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsPageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings_page)
+
         binding = ActivitySettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
         enableEdgeToEdge()
+
+        val btnLogin = findViewById<Button>(R.id.btnlogin)
+        btnLogin.setOnClickListener {
+            showLoginDialog()
+        }
 
         // Handle system bars
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
@@ -31,6 +41,57 @@ class SettingsPage : AppCompatActivity() {
         binding.btnAddName.setOnClickListener {
             showNameAndSectionDialog()
         }
+    }
+    private fun showLoginDialog() {
+        // 1. Inflate the dialog layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_teacher_login, null)
+
+        // 2. Create the AlertDialog
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        builder.setView(dialogView)
+
+        // Create the dialog instance but don't show it yet
+        val dialog = builder.create()
+
+        // Make background transparent so the rounded CardView shows properly
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // 3. Initialize views INSIDE the popup
+        val etEmail = dialogView.findViewById<EditText>(R.id.etDialogEmail)
+        val etPassword = dialogView.findViewById<EditText>(R.id.etDialogPassword)
+        val btnSubmit = dialogView.findViewById<android.widget.Button>(R.id.btnDialogSubmit)
+        val tvForgot = dialogView.findViewById<TextView>(R.id.tvForgotPassword)
+        val tvRegister = dialogView.findViewById<TextView>(R.id.tvRegister)
+
+        // 4. Handle Submit Click
+        btnSubmit.setOnClickListener {
+            val email = etEmail.text.toString()
+            val password = etPassword.text.toString()
+
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                // TODO: Add your Online Database/Firebase Login Logic Here
+                Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            } else {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // 5. Handle Forgot Password
+        tvForgot.setOnClickListener {
+            Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show()
+            // Add logic to reset password
+        }
+
+        // 6. Handle Register
+        tvRegister.setOnClickListener {
+            Toast.makeText(this, "Register clicked", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            // Navigate to a Registration Activity if you have one
+        }
+
+        // 7. Show the dialog
+        dialog.show()
     }
 
     private fun showNameAndSectionDialog() {
