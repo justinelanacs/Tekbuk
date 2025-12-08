@@ -7,4 +7,13 @@
 
     <style name="Theme.Tekbuk" parent="Base.Theme.Tekbuk" />
     <style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar" />
+
+
+
+    <!-- ⭐ ADD THIS NEW STYLE BLOCK ⭐ -->
+    <style name="PagtatayaRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="buttonTint">@color/one</item>
+        <item name="android:textColor">@color/one</item>
+    </style>
+
 </resources>

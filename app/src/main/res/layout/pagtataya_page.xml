@@ -92,48 +92,45 @@
 
                 <RadioButton
                     android:id="@+id/rbOptionA"
+                    style="@style/PagtatayaRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-
                     android:padding="12dp"
                     android:text="Option A"
-                    android:textColor="@color/black"
                     android:textSize="16sp" />
 
                 <RadioButton
                     android:id="@+id/rbOptionB"
+                    style="@style/PagtatayaRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-
                     android:padding="12dp"
                     android:text="Option B"
-                    android:textColor="@color/black"
                     android:textSize="16sp" />
 
                 <RadioButton
                     android:id="@+id/rbOptionC"
+                    style="@style/PagtatayaRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-
                     android:padding="12dp"
                     android:text="Option C"
-                    android:textColor="@color/black"
                     android:textSize="16sp" />
 
                 <RadioButton
                     android:id="@+id/rbOptionD"
+                    style="@style/PagtatayaRadioButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-
                     android:padding="12dp"
                     android:text="Option D"
-                    android:textColor="@color/black"
                     android:textSize="16sp" />
             </RadioGroup>
+
 
         </LinearLayout>
     </ScrollView>
