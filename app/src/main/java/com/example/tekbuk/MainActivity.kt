@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.tekbuk.HomepageContent.*
+import com.example.tekbuk.HomapageContent.*
 import com.example.tekbuk.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

@@ -8,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tekbuk.HomepageContent.GawainPageActivity
-import com.example.tekbuk.HomepageContent.MarkaPageActivity
-import com.example.tekbuk.HomepageContent.PagtatayaPageActivity
-import com.example.tekbuk.HomepageContent.PaksaPageActivity
-import com.example.tekbuk.HomepageContent.RepleksyonPageActivity
+import com.example.tekbuk.HomapageContent.GawainPageActivity
+import com.example.tekbuk.HomapageContent.MarkaPageActivity
+import com.example.tekbuk.HomapageContent.PagtatayaPageActivity
+import com.example.tekbuk.HomapageContent.PaksaPageActivity
+import com.example.tekbuk.HomapageContent.RepleksyonPageActivity
 import com.example.tekbuk.R
 import com.example.tekbuk.model.MainMenuItem
 

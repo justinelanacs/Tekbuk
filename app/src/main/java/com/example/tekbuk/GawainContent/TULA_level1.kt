@@ -2,7 +2,6 @@ package com.example.tekbuk.GawainContent
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -31,9 +30,6 @@ class TULA_level1 : AppCompatActivity() {
     private val gridSize = 15
     private val cells = Array(gridSize) { arrayOfNulls<EditText>(gridSize) }
 
-    // This flag prevents finishLevel from being called multiple times
-    private var levelFinished = false
-
     data class Word(
         val text: String,
         val startRow: Int,
@@ -54,6 +50,7 @@ class TULA_level1 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_tula_level1)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -61,11 +58,14 @@ class TULA_level1 : AppCompatActivity() {
         }
 
         timerText = findViewById(R.id.timer)
-        scoreText = findViewById(R.id.score)
-        crosswordGrid = findViewById(R.id.crosswordGrid)
+        timerText.text = "00:00"
 
+        scoreText = findViewById(R.id.score)
+        scoreText.text = ""
+
+        crosswordGrid = findViewById(R.id.crosswordGrid)
         buildGrid()
-        loadSavedState()
+        loadSavedState() // Restore previous answers and score
     }
 
     private fun startTimer(timeInMillis: Long) {
@@ -79,15 +79,17 @@ class TULA_level1 : AppCompatActivity() {
             override fun onFinish() {
                 timerText.text = "Time's up!"
                 disableAllCells()
-                if (!levelFinished) {
-                    finishLevel()
-                }
+                finishLevel()
             }
         }.start()
     }
 
     private fun disableAllCells() {
-        cells.forEach { row -> row.forEach { it?.isEnabled = false } }
+        for (row in 0 until gridSize) {
+            for (col in 0 until gridSize) {
+                cells[row][col]?.isEnabled = false
+            }
+        }
     }
 
     private fun buildGrid() {
@@ -100,26 +102,26 @@ class TULA_level1 : AppCompatActivity() {
 
         for (row in 0 until gridSize) {
             for (col in 0 until gridSize) {
-                val cell = EditText(this).apply {
-                    layoutParams = GridLayout.LayoutParams().apply {
-                        width = px
-                        height = px
-                        setMargins(1, 1, 1, 1)
-                        rowSpec = GridLayout.spec(row)
-                        columnSpec = GridLayout.spec(col)
-                    }
-                    setBackgroundColor(Color.DKGRAY)
-                    isEnabled = false
-                    filters = arrayOf(InputFilter.LengthFilter(1))
-                    textSize = 12f
-                    setTextColor(Color.BLACK)
-                    gravity = android.view.Gravity.CENTER
-                    isSingleLine = true
-                    isFocusable = false
-                    isFocusableInTouchMode = false
-                    isCursorVisible = false
-                    setPadding(0, 0, 0, 0)
+                val cell = EditText(this)
+                val params = GridLayout.LayoutParams().apply {
+                    width = px
+                    height = px
+                    setMargins(1, 1, 1, 1)
+                    rowSpec = GridLayout.spec(row)
+                    columnSpec = GridLayout.spec(col)
                 }
+                cell.layoutParams = params
+                cell.setBackgroundColor(Color.DKGRAY)
+                cell.isEnabled = false
+                cell.filters = arrayOf(InputFilter.LengthFilter(1))
+                cell.textSize = sizeDp * 0.7f
+                cell.setTextColor(Color.BLACK)
+                cell.gravity = android.view.Gravity.CENTER
+                cell.isSingleLine = true
+                cell.isFocusable = false
+                cell.isFocusableInTouchMode = false
+                cell.isCursorVisible = false
+                cell.setPadding(0, 0, 0, 0)
                 crosswordGrid.addView(cell)
                 cells[row][col] = cell
             }
@@ -130,15 +132,17 @@ class TULA_level1 : AppCompatActivity() {
                 val r = if (word.direction == "H") word.startRow else word.startRow + i
                 val c = if (word.direction == "H") word.startCol + i else word.startCol
                 if (r !in 0 until gridSize || c !in 0 until gridSize) continue
-                cells[r][c]?.apply {
+                val cell = cells[r][c]
+                cell?.apply {
                     setBackgroundColor(Color.WHITE)
                     isEnabled = true
+                    val currentWord = word
                     setOnClickListener {
                         if (!timerStarted) {
-                            startTimer(10 * 60 * 1000) // 10 minutes
+                            startTimer(10 * 60 * 1000)
                             timerStarted = true
                         }
-                        showWordDialog(word)
+                        showWordDialog(currentWord)
                     }
                 }
             }
@@ -150,15 +154,18 @@ class TULA_level1 : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(50, 40, 50, 10)
         }
+
         val clueView = TextView(this).apply {
             text = word.clue
             textSize = 16f
             setPadding(0, 0, 0, 20)
         }
+
         val input = EditText(this).apply {
             hint = "Enter your answer"
             isSingleLine = true
         }
+
         layout.addView(clueView)
         layout.addView(input)
 
@@ -168,7 +175,7 @@ class TULA_level1 : AppCompatActivity() {
             .setPositiveButton("Submit") { dialog, _ ->
                 val answer = input.text.toString().uppercase()
                 if (answer == word.text) {
-                    fillWord(word, isNewAnswer = true)
+                    fillWord(word, saveScore = true)
                     Toast.makeText(this, "✅ Correct!", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "❌ Wrong! Try again.", Toast.LENGTH_SHORT).show()
@@ -179,48 +186,45 @@ class TULA_level1 : AppCompatActivity() {
             .show()
     }
 
-    private fun fillWord(word: Word, isNewAnswer: Boolean) {
+    private fun fillWord(word: Word, saveScore: Boolean) {
         for (i in word.text.indices) {
             val r = if (word.direction == "H") word.startRow else word.startRow + i
             val c = if (word.direction == "H") word.startCol + i else word.startCol
-            cells[r][c]?.apply {
+            val cell = cells[r][c]
+            cell?.apply {
                 setText(word.text[i].toString())
                 isEnabled = false
                 setBackgroundColor(Color.parseColor("#C8E6C9"))
             }
         }
 
-        if (isNewAnswer) {
-            // ⭐ FIX: Save the word state BEFORE checking for completion
+        if (saveScore) {
+            score += 2
             saveWordState(word)
+            saveScoreState()
+        }
 
-            // Recalculate score from scratch to ensure accuracy
-            recalculateScore()
-
-            // Now check if all words are completed
-            if (words.all { wordCompleted(it) } && !levelFinished) {
-                countDownTimer?.cancel()
-                finishLevel()
-            }
+        if (words.all { wordCompleted(it) }) {
+            countDownTimer?.cancel()
+            finishLevel()
         }
     }
 
     private fun wordCompleted(word: Word): Boolean {
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
-        return sharedPref.getBoolean("word_${word.text}_completed", false)
+        for (i in word.text.indices) {
+            val r = if (word.direction == "H") word.startRow else word.startRow + i
+            val c = if (word.direction == "H") word.startCol + i else word.startCol
+            val cell = cells[r][c] ?: return false
+            if (cell.text.toString() != word.text[i].toString()) return false
+        }
+        return true
     }
 
     private fun finishLevel() {
-        // Prevent this function from running more than once
-        if (levelFinished) return
-        levelFinished = true
+        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        val alreadyCompleted = sharedPref.getBoolean("level_completed", false)
 
-        // Ensure score is correct before finishing
-        recalculateScore()
-
-        // Save the final score to the correct "UserScores" file
-        saveFinalScore("TULA", 1, score)
-
+        // Set result for GawainPageActivity
         val resultIntent = Intent().apply {
             putExtra("paksa_id", "tula")
             putExtra("level_completed", 1)
@@ -228,49 +232,36 @@ class TULA_level1 : AppCompatActivity() {
         }
         setResult(Activity.RESULT_OK, resultIntent)
 
-        AlertDialog.Builder(this)
-            .setTitle("Level Completed!")
-            .setMessage("Your final score is $score / 10")
-            .setPositiveButton("OK") { _, _ -> finish() }
-            .setCancelable(false)
-            .show()
+        // Show dialog only if not already completed
+        if (!alreadyCompleted) {
+            sharedPref.edit().putBoolean("level_completed", true).apply()
+            AlertDialog.Builder(this)
+                .setTitle("Level Completed!")
+                .setMessage("Your final score is $score / 10")
+                .setPositiveButton("OK") { _, _ -> finish() }
+                .show()
+        }
     }
 
-    private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
-        val prefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
-        val editor = prefs.edit()
-        val key = "${topic}_LEVEL_${level}"
-        editor.putInt(key, scoreToSave)
-        editor.apply()
-    }
-
+    // --- Persistence ---
     private fun saveWordState(word: Word) {
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
         sharedPref.edit().putBoolean("word_${word.text}_completed", true).apply()
     }
 
-    // ⭐ FIX: Renamed this function for clarity and purpose
-    private fun loadSavedState() {
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
-        for (word in words) {
-            if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
-                fillWord(word, isNewAnswer = false)
-            }
-        }
-        // Recalculate score based on loaded state
-        recalculateScore()
+    private fun saveScoreState() {
+        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        sharedPref.edit().putInt("score", score).apply()
     }
 
-    // ⭐ FIX: New function to reliably calculate the score
-    private fun recalculateScore() {
-        var currentScore = 0
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
-        for (word in words) {
-            if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
-                currentScore += 2
-            }
-        }
-        score = currentScore
+    private fun loadSavedState() {
+        val sharedPref = getSharedPreferences("TULA_Level1", MODE_PRIVATE)
+        score = sharedPref.getInt("score", 0)
         scoreText.text = if (score > 0) "Score: $score / 10" else ""
+
+        for (word in words) {
+            val completed = sharedPref.getBoolean("word_${word.text}_completed", false)
+            if (completed) fillWord(word, saveScore = false)
+        }
     }
 }

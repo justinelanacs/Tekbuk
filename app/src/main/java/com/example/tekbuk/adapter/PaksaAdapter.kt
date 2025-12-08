@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tekbuk.R
 import com.example.tekbuk.model.PaksaItem
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.example.tekbuk.HomepageContent.PaksaPageActivity
+import com.example.tekbuk.HomapageContent.PaksaPageActivity
 import com.example.tekbuk.PaksaContent.*
 
 class PaksaAdapter(
