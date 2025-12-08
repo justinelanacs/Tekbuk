@@ -1,5 +1,6 @@
 package com.example.tekbuk.HomepageContent
 
+import android.content.Context
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
@@ -41,13 +42,14 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
         viewPager = findViewById(R.id.paksaCarousel)
         dotIndicator = findViewById(R.id.dotIndicator)
 
-        // Initialize paksa items with raw text descriptions
+        // Initialize paksa items with a default progress of 0
         paksaItems = mutableListOf(
             PaksaItem("TULA", readRawText(R.raw.tula_desc), R.drawable.tula, 0),
             PaksaItem("SANAYSAY", readRawText(R.raw.sanaysay_desc), R.drawable.sanaysay, 0),
             PaksaItem("DAGLI", readRawText(R.raw.dagli_desc), R.drawable.dagli, 0),
             PaksaItem("TALUMPATI", readRawText(R.raw.talumpati_desc), R.drawable.talumpati, 0),
-            PaksaItem("KWENTONG BAYAN", readRawText(R.raw.kwentongbayan_desc), R.drawable.kwentongbayan, 0)
+            // ⭐ Use a consistent ID for Kwentong Bayan to make saving easier
+            PaksaItem("KWENTONG_BAYAN", readRawText(R.raw.kwentongbayan_desc), R.drawable.kwentongbayan, 0)
         )
 
         // Setup adapter
@@ -70,28 +72,61 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
             page.scaleY = scale
         }
 
-        // Attach TabLayout as dot indicator with spacing
-        TabLayoutMediator(dotIndicator, viewPager) { tab, _ ->
-            val tabView = tab.view
-            val params = tabView.layoutParams as? ViewGroup.MarginLayoutParams
-            params?.let {
-                val marginDp = 4  // margin in dp
-                val marginPx = (marginDp * resources.displayMetrics.density).toInt()
-                it.marginStart = marginPx
-                it.marginEnd = marginPx
-                tabView.layoutParams = it
-            }
-        }.attach()
+        // Attach TabLayout as dot indicator
+        TabLayoutMediator(dotIndicator, viewPager) { _, _ -> }.attach()
 
         // Set scroll listener for live progress updates
         BaseContentActivity.scrollListener = this
     }
 
-    // Scroll progress callback
+    // ⭐ ADDED: onResume is the best place to load data that needs to be fresh
+    override fun onResume() {
+        super.onResume()
+        // Load the saved progress every time the user returns to this screen
+        loadProgress()
+    }
+
+    /**
+     * ⭐ ADDED: Loads progress for all paksa items from SharedPreferences.
+     */
+    private fun loadProgress() {
+        val prefs = getSharedPreferences("PaksaProgress", Context.MODE_PRIVATE)
+        var hasChanges = false
+        for (item in paksaItems) {
+            // Create a unique key for each topic, e.g., "progress_TULA"
+            val key = "progress_${item.title}"
+            val savedProgress = prefs.getInt(key, 0)
+            if (item.progress != savedProgress) {
+                item.progress = savedProgress
+                hasChanges = true
+            }
+        }
+
+        // Only update the adapter if any progress value actually changed
+        if (hasChanges) {
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * ⭐ ADDED: Saves a specific topic's progress to SharedPreferences.
+     */
+    private fun saveProgress(paksaTitle: String, progress: Int) {
+        val prefs = getSharedPreferences("PaksaProgress", Context.MODE_PRIVATE)
+        val key = "progress_$paksaTitle"
+        prefs.edit().putInt(key, progress).apply()
+    }
+
+    // ⭐ UPDATED: This function now also saves the progress
     override fun onProgressUpdate(index: Int, progress: Int) {
         if (index in paksaItems.indices) {
-            paksaItems[index].progress = progress
+            val item = paksaItems[index]
+            // Update the progress in memory
+            item.progress = progress
+            // Update the specific item in the adapter for a smooth animation
             adapter.notifyItemChanged(index)
+            // Save the new progress to persistent storage
+            saveProgress(item.title, progress)
         }
     }
 }

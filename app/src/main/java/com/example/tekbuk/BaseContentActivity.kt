@@ -2,6 +2,7 @@ package com.example.tekbuk.PaksaContent
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.Gravity // ⭐ 1. IMPORT THIS
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.ScrollView
@@ -20,8 +21,6 @@ abstract class BaseContentActivity : AppCompatActivity() {
     protected lateinit var scrollView: ScrollView
     protected lateinit var btnFinishReading: Button
     protected lateinit var textContent: TextView
-
-    // Newly added views for dynamic title & subtitle
     protected lateinit var textTitle: TextView
     protected lateinit var textSubtitle: TextView
 
@@ -29,16 +28,24 @@ abstract class BaseContentActivity : AppCompatActivity() {
         var scrollListener: ScrollProgressListener? = null
     }
 
-    // Subclasses MUST provide raw content file, title, and subtitle
+    // Subclasses MUST provide these values
     abstract val contentRawRes: Int
     abstract val pageTitle: String
     abstract val pageSubtitle: String
+    // ⭐ 2. ADD THIS ABSTRACT PROPERTY
+    // This forces child classes (TulaContent, SanaysayContent) to specify an alignment.
+    abstract val textAlignment: Int
+
+    private var paksaIndex: Int = -1
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // It's okay to use activity_tula_content, as we will override its properties
         setContentView(R.layout.activity_tula_content)
+
+        paksaIndex = intent.getIntExtra("paksa_index", -1)
 
         // Apply edge padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -47,53 +54,68 @@ abstract class BaseContentActivity : AppCompatActivity() {
             insets
         }
 
-        // Initialize main views
+        // Initialize all views
         hiddenProgress = findViewById(R.id.hiddenProgress)
         scrollView = findViewById(R.id.scrollView)
         btnFinishReading = findViewById(R.id.btnFinishReading)
         textContent = findViewById(R.id.textContent)
-
-        // Initialize new Title and Subtitle (YOU ADDED THESE IDs)
         textTitle = findViewById(R.id.Title)
         textSubtitle = findViewById(R.id.Subtitle)
 
-        // APPLY TITLE & SUBTITLE DYNAMICALLY
+        // APPLY DYNAMIC CONTENT
         textTitle.text = pageTitle
         textSubtitle.text = pageSubtitle
+        textContent.text = resources.openRawResource(contentRawRes).bufferedReader().use { it.readText() }
 
-        // Load TEXT CONTENT from raw .txt
-        val inputStream = resources.openRawResource(contentRawRes)
-        textContent.text = inputStream.bufferedReader().use { it.readText() }
+        // ⭐ 3. OVERRIDE THE XML ALIGNMENT
+        // This line programmatically sets the gravity of the TextView,
+        // ignoring what's in the XML file.
+        textContent.gravity = textAlignment
 
         hiddenProgress.max = 100
 
         // Scroll progress logic
         scrollView.viewTreeObserver.addOnScrollChangedListener {
-            val scrollY = scrollView.scrollY
             val contentHeight = scrollView.getChildAt(0).height
             val scrollViewHeight = scrollView.height
-            val totalScroll = contentHeight - scrollViewHeight
-
-            if (totalScroll > 0) {
+            // Check if there is anything to scroll
+            if (contentHeight > scrollViewHeight) {
+                val scrollY = scrollView.scrollY
+                val totalScroll = contentHeight - scrollViewHeight
                 val progress = (scrollY * 100f / totalScroll).toInt().coerceIn(0, 100)
-                hiddenProgress.progress = progress
-
-                // Notify PaksaPageActivity
-                scrollListener?.onProgressUpdate(
-                    intent.getIntExtra("paksa_index", -1),
-                    progress
-                )
+                notifyProgress(progress)
+            } else {
+                // ⭐ FIX: If content is not scrollable, it's considered 100% read
+                notifyProgress(100)
             }
         }
 
-        // Finish Reading Button
-        btnFinishReading.setOnClickListener { finish() }
+        // ⭐ FIX: "Finish Reading" button now properly updates progress to 100%
+        btnFinishReading.setOnClickListener { finishReading() }
 
-        // Back Button Handling
+        // ⭐ FIX: The Back Button now properly updates progress to 100%
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                finish()
+                finishReading()
             }
         })
+    }
+
+    /**
+     * ⭐ ADDED: Centralized method to ensure progress is set to 100% on finish.
+     */
+    private fun finishReading() {
+        notifyProgress(100) // Notify that the progress is 100%
+        finish() // Then, finish the activity
+    }
+
+    /**
+     * ⭐ ADDED: A cleaner helper function to send progress updates.
+     */
+    private fun notifyProgress(progress: Int) {
+        hiddenProgress.progress = progress
+        if (paksaIndex != -1) {
+            scrollListener?.onProgressUpdate(paksaIndex, progress)
+        }
     }
 }

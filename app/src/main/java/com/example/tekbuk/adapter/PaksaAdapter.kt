@@ -48,7 +48,7 @@ class PaksaAdapter(
                 "SANAYSAY" -> Intent(context, SanaysayContent::class.java)
                 "DAGLI" -> Intent(context, DagliContent::class.java)
                 "TALUMPATI" -> Intent(context, TalumpatiContent::class.java)
-                "KWENTONG BAYAN" -> Intent(context, KwentongbayanContent::class.java)
+                "KWENTONG_BAYAN" -> Intent(context, KwentongbayanContent::class.java)
                 else -> null
             }
 
