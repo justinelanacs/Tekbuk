@@ -1,5 +1,5 @@
 Alin sa sumusunod ang posisyon ng pangunahing tauhan sa paglalaro ng basketball?|blocker|center|forward|guard|2
 Bakit tinawag na Mr. Big Shot ang pangunahing tauhan?|Wala siyang absent sa mga laro|Wala siyang foul sa bawat laban|Wala siyang mintis sa court|Wala siyang travelling call|3
 Bakit bumalik sa lumang basketball court ang pangunahing tauhan?|Gusto niyang balikan ang ugat ng kanyang mga pangarap.|Hangad niyang makitang muli ang mga kinalakihang kalaro.|Nais niyang maglaro ulit ng basketball sa kinalakihang lugar.|Nasa niyang balikan ang alaalang dala ng kinalakihang lugar|1
-Ilang dipa na lang ang kaniyang layo sa court, abot-tanaw na niya ang mga kabataang naglalaro. Napakabigat na ng mga hakbang papunta dito ngayon. “Kung hindi ko sana...” Bulong niya. Anong damdamin ng tauhan ang mahihinuha sa binasang pahayag?|nag-aalala|nanghihinayang|nagdaramdam|nagtatakot|2
+Ilang dipa na lang ang kaniyang layo… anong damdamin ang mahihinuha?|nag-aalala|nanghihinayang|nagdaramdam|nagtatakot|2
 Alin sa sumusunod ang maaaring dahilan kung bakit urong-sulong ang pangunahing tauhan?|Iniisip miya kung dadalo o hindi|Iniisip niya kung maiiwan o hindi|Iniisip niya kung pupunta o hindi|Iniisip niya kung sasama o hindi|3

@@ -1,4 +1,4 @@
-package com.example.tekbuk.HomepageContent
+package com.example.tekbuk.HomapageContent
 
 import android.os.Bundle
 import android.view.ViewGroup
