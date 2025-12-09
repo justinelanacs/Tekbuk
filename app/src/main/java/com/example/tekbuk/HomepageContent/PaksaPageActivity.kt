@@ -49,7 +49,7 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
             PaksaItem("DAGLI", readRawText(R.raw.dagli_desc), R.drawable.dagli, 0),
             PaksaItem("TALUMPATI", readRawText(R.raw.talumpati_desc), R.drawable.talumpati, 0),
             // ⭐ Use a consistent ID for Kwentong Bayan to make saving easier
-            PaksaItem("KWENTONG_BAYAN", readRawText(R.raw.kwentongbayan_desc), R.drawable.kwentongbayan, 0)
+            PaksaItem("KWENTONG BAYAN", readRawText(R.raw.kwentongbayan_desc), R.drawable.kwentongbayan, 0)
         )
 
         // Setup adapter
