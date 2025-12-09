@@ -9,40 +9,57 @@
     tools:context=".HomepageContent.MarkaPageActivity">
 
     <!-- Main Container for the Header -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/mainContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
         android:padding="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Title -->
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
-            android:layout_marginBottom="10dp"
-            android:text="MARKA/ISKOR"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+        <!-- ImageView positioned in the top-right corner -->
+        <ImageView
+            android:id="@+id/sendButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:src="@drawable/send_icon"
+            app:tint="@color/one" /> <!-- Optional: To color the icon -->
 
-        <!-- Subtitle -->
-        <TextView
-            android:id="@+id/subTitleText"
+        <!-- Container for the centered text -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
             android:gravity="center"
-            android:text="Mga resulta ng inyong pagsusulit at pag-aaral"
-            android:textColor="@color/one"
-            android:textSize="16sp" />
-    </LinearLayout>
+            android:orientation="vertical">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="10dp"
+                android:text="MARKA/ISKOR"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Subtitle -->
+            <TextView
+                android:id="@+id/subTitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:gravity="center"
+                android:text="Mga resulta ng inyong pagsusulit at pag-aaral"
+                android:textColor="@color/one"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </FrameLayout>
+
 
 
     <!-- Placeholder View ("Walang Pagsusulit Pa") -->
