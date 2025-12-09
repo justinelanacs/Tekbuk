@@ -160,14 +160,76 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- ⭐ PAGTATAYA Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPagtataya"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:visibility="gone"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="4dp"
+                tools:visibility="visible"> <!-- tools:visibility lets you see it in the design editor -->
+
+                <LinearLayout
+                    android:background="@drawable/mainbutton_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:layout_gravity="center_horizontal"
+                        android:text="PAGTATAYA"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textStyle="bold" />
+
+                    <!-- Score -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Iskor:"
+                            android:textSize="16sp"
+                            android:textAppearance="?attr/textAppearanceBody1" />
+
+                        <TextView
+                            android:id="@+id/textViewPagtatayaScore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/placeholder_score_background"
+                            android:gravity="center"
+                            android:minWidth="80dp"
+                            android:paddingStart="16dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="4dp"
+                            android:text=" "
+                            android:textAppearance="?attr/textAppearanceBody1" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- TULA Section -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTula"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="4dp">
+                app:cardElevation="4dp"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:background="@drawable/mainbutton_bg"
@@ -285,8 +347,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="4dp">
+                app:cardElevation="4dp"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:background="@drawable/mainbutton_bg"
@@ -404,8 +468,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="4dp">
+                app:cardElevation="4dp"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:background="@drawable/mainbutton_bg"
@@ -519,8 +585,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="4dp">
+                app:cardElevation="4dp"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:background="@drawable/mainbutton_bg"
@@ -634,8 +702,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="4dp">
+                app:cardElevation="4dp"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:background="@drawable/mainbutton_bg"
