@@ -29,7 +29,7 @@
             android:id="@+id/etDialogEmail"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-
+            android:textColorHint="@color/one"
             android:hint="Email Address"
             android:inputType="textEmailAddress"
             android:paddingStart="12dp"
@@ -42,7 +42,7 @@
             android:id="@+id/etDialogPassword"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-
+            android:textColorHint="@color/one"
             android:hint="Password"
             android:inputType="textPassword"
             android:paddingStart="12dp"
@@ -73,7 +73,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Forgot Password?"
-                android:textColor="@color/four"
+                android:textColor="@color/tree"
                 android:textSize="14sp"
                 android:padding="5dp" />
 

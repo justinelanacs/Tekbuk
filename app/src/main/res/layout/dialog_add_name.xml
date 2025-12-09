@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:text="Ilagay ang Datos"
+                android:textColor="@color/one"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- Name Input (Styled like the reference) -->
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="12dp"
+                android:hint="Ilagay ang iyong pangalan"
+                android:textColorHint="@color/one"
+                android:inputType="textCapWords"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textSize="14sp" />
+
+            <!-- Section Input (Styled like the reference) -->
+            <EditText
+                android:id="@+id/etSection"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="20dp"
+                android:hint="Ilagay ang iyong seksyon"
+                android:textColorHint="@color/one"
+                android:inputType="textCapCharacters"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textSize="14sp" />
+
+            <!-- Save Button (Styled like the reference) -->
+            <Button
+                android:id="@+id/btnDialogSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/one"
+                android:text="I-SAVE"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <!-- Optional Cancel Button (A simple text button) -->
+            <TextView
+                android:id="@+id/btnDialogCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="12dp"
+                android:padding="5dp"
+                android:text="Kanselahin"
+                android:textColor="@color/one"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>
