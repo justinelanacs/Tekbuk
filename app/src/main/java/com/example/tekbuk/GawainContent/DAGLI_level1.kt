@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.LinearLayout
@@ -144,38 +145,47 @@ class DAGLI_level1 : AppCompatActivity() {
         }
     }
 
-    private fun showWordDialog(word: Word) {
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(50, 40, 50, 10)
-        }
-        val clueView = TextView(this).apply {
-            text = word.clue
-            textSize = 16f
-            setPadding(0, 0, 0, 20)
-        }
-        val input = EditText(this).apply {
-            hint = "Enter your answer"
-            isSingleLine = true
-        }
-        layout.addView(clueView)
-        layout.addView(input)
+    private fun showWordDialog(word: DAGLI_level1.Word) {
+        // 1. Inflate the custom layout we just created
+        val dialogView = layoutInflater.inflate(R.layout.dialog_crossword_input, null)
 
-        AlertDialog.Builder(this)
-            .setTitle("Answer the clue!!")
-            .setView(layout)
-            .setPositiveButton("Submit") { dialog, _ ->
-                val answer = input.text.toString().uppercase()
-                if (answer == word.text) {
-                    fillWord(word, isNewAnswer = true)
-                    Toast.makeText(this, "✅ Correct!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "❌ Wrong! Try again.", Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
+        // 2. Create the AlertDialog builder
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogView)
+
+        // 3. Create the dialog and make its background transparent to show the CardView's rounded corners
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // 4. Get the views from inside our custom layout
+        val clueView = dialogView.findViewById<TextView>(R.id.dialogClue)
+        val input = dialogView.findViewById<EditText>(R.id.dialogInput)
+        val btnSubmit = dialogView.findViewById<Button>(R.id.btnDialogSubmit)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnDialogCancel)
+
+        // Set the clue text dynamically
+        clueView.text = word.clue
+
+        // 5. Set the click listener for the Submit button
+        btnSubmit.setOnClickListener {
+            val answer = input.text.toString().trim().uppercase()
+            if (answer == word.text) {
+                fillWord(word, isNewAnswer = true)
+                Toast.makeText(this, "✅ Tama!", Toast.LENGTH_SHORT).show()
+                dialog.dismiss() // Close the dialog on correct answer
+            } else {
+                Toast.makeText(this, "❌ Mali! Subukan muli.", Toast.LENGTH_SHORT).show()
+                // We don't dismiss the dialog, so the user can try again
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+
+        // 6. Set the click listener for the Cancel button
+        btnCancel.setOnClickListener {
+            dialog.dismiss() // Just close the dialog
+        }
+
+        // 7. Show the beautiful new dialog
+        dialog.show()
     }
 
     private fun fillWord(word: Word, isNewAnswer: Boolean) {
