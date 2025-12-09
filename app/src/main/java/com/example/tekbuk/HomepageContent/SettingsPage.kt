@@ -14,7 +14,10 @@ import com.example.tekbuk.databinding.ActivitySettingsPageBinding
 import com.example.tekbuk.R
 import android.widget.Button
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+
 class SettingsPage : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
 
     private lateinit var binding: ActivitySettingsPageBinding
 
@@ -43,54 +46,75 @@ class SettingsPage : AppCompatActivity() {
         }
     }
     private fun showLoginDialog() {
-        // 1. Inflate the dialog layout
         val dialogView = layoutInflater.inflate(R.layout.dialog_teacher_login, null)
-
-        // 2. Create the AlertDialog
         val builder = androidx.appcompat.app.AlertDialog.Builder(this)
         builder.setView(dialogView)
-
-        // Create the dialog instance but don't show it yet
         val dialog = builder.create()
-
-        // Make background transparent so the rounded CardView shows properly
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        // 3. Initialize views INSIDE the popup
         val etEmail = dialogView.findViewById<EditText>(R.id.etDialogEmail)
         val etPassword = dialogView.findViewById<EditText>(R.id.etDialogPassword)
         val btnSubmit = dialogView.findViewById<android.widget.Button>(R.id.btnDialogSubmit)
         val tvForgot = dialogView.findViewById<TextView>(R.id.tvForgotPassword)
         val tvRegister = dialogView.findViewById<TextView>(R.id.tvRegister)
 
-        // 4. Handle Submit Click
+
+        // 1. LOGIN LOGIC
         btnSubmit.setOnClickListener {
-            val email = etEmail.text.toString()
-            val password = etPassword.text.toString()
+            val email = etEmail.text.toString().trim()
+            val password = etPassword.text.toString().trim()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                // TODO: Add your Online Database/Firebase Login Logic Here
-                Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show()
-                dialog.dismiss()
+                // Determine if we are logging in or registering based on button text
+                if (btnSubmit.text == "MAG-LOGIN") {
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this) { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                                dialog.dismiss()
+                                // TODO: Navigate to Teacher Dashboard Activity here
+                            } else {
+                                Toast.makeText(this, "Login Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                } else {
+                    // REGISTRATION LOGIC
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this) { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this, "Account Created Successfully!", Toast.LENGTH_SHORT).show()
+                                // Optionally save teacher details to Firestore here
+                                dialog.dismiss()
+                            } else {
+                                Toast.makeText(this, "Registration Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                }
             } else {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // 5. Handle Forgot Password
+        // 2. SWITCH TO REGISTER MODE
+        tvRegister.setOnClickListener {
+            if (btnSubmit.text == "MAG-LOGIN") {
+                // Switch UI to Register
+                btnSubmit.text = "REGISTER"
+                tvRegister.text = "Already have an account? Login"
+                // Optional: Change title if you added an ID to the TextView "Teacher Login"
+                // tvTitle.text = "Create Account"
+            } else {
+                // Switch UI back to Login
+                btnSubmit.text = "MAG-LOGIN"
+                tvRegister.text = "Create Teacher Account"
+                // tvTitle.text = "Teacher Login"
+            }
+        }
+
         tvForgot.setOnClickListener {
             Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show()
-            // Add logic to reset password
         }
 
-        // 6. Handle Register
-        tvRegister.setOnClickListener {
-            Toast.makeText(this, "Register clicked", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-            // Navigate to a Registration Activity if you have one
-        }
-
-        // 7. Show the dialog
         dialog.show()
     }
 
