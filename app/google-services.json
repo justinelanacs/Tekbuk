@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "692484798552",
+    "project_id": "tekbuk",
+    "storage_bucket": "tekbuk.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:692484798552:android:2df0cea14c93f3fb26722d",
+        "android_client_info": {
+          "package_name": "com.example.tekbuk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwzoPddqvrezqI2svbNBi6-UZKc8tVYQY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -18,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
         <!-- ImageView positioned in the top-right corner -->
         <ImageView
             android:id="@+id/sendButton"
@@ -25,6 +26,7 @@
             android:layout_height="24dp"
             android:layout_gravity="top|end"
             android:src="@drawable/send_icon"
+            android:contentDescription="Send Scores to Teacher"
             app:tint="@color/one" /> <!-- Optional: To color the icon -->
 
         <!-- Container for the centered text -->
