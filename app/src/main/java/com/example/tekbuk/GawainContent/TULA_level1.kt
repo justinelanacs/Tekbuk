@@ -11,9 +11,9 @@ import android.text.InputFilter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.GridLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback // ⭐ 1. IMPORT OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,8 +32,12 @@ class TULA_level1 : AppCompatActivity() {
     private val gridSize = 15
     private val cells = Array(gridSize) { arrayOfNulls<EditText>(gridSize) }
 
-    // This flag prevents finishLevel from being called multiple times
     private var levelFinished = false
+
+    // SharedPreferences keys
+    private val prefsName = "TULA_Level1_Progress"
+    private val keyLevelFinished = "LevelFinishedPermanently"
+    private val keyTimeTaken = "TimeTaken"
 
     data class Word(
         val text: String,
@@ -55,21 +59,158 @@ class TULA_level1 : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_tula_level1)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
+        // ⭐ 2. SET UP THE BACK BUTTON HANDLER
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Only show the warning if the level is not yet finished.
+                if (!levelFinished) {
+                    showExitWarningDialog()
+                } else {
+                    // If level is finished, allow normal back press.
+                    finish()
+                }
+            }
+        })
+
         timerText = findViewById(R.id.timer)
         scoreText = findViewById(R.id.score)
         crosswordGrid = findViewById(R.id.crosswordGrid)
 
-        buildGrid()
-        loadSavedState()
+        // Check if the level has been permanently finished
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        if (prefs.getBoolean(keyLevelFinished, false)) {
+            levelFinished = true
+            showAlreadyCompletedDialog()
+        } else {
+            buildGrid()
+            loadSavedState()
+        }
+    }
+
+    // ⭐ 3. UPDATED FUNCTION: Shows a CardView dialog with score and time.
+    private fun showAlreadyCompletedDialog() {
+        // Inflate the custom layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_level_completed, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // Get views from the dialog layout
+        val tvScore = dialogView.findViewById<TextView>(R.id.tvDialogScore)
+        val tvTime = dialogView.findViewById<TextView>(R.id.tvDialogTime)
+        val btnOk = dialogView.findViewById<Button>(R.id.btnDialogOk)
+
+        // Retrieve the saved score and time
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        val savedScore = getSharedPreferences("UserScores", MODE_PRIVATE).getInt("TULA_LEVEL_1", 0)
+        val timeTakenSeconds = prefs.getInt(keyTimeTaken, 0)
+
+        // Format the retrieved data and set it to the TextViews
+        tvScore.text = "$savedScore / 10"
+        val minutes = timeTakenSeconds / 60
+        val seconds = timeTakenSeconds % 60
+        tvTime.text = String.format("%02d:%02d", minutes, seconds)
+
+        // Set the button click listener to finish the activity
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+
+        dialog.setCancelable(false)
+        dialog.show()
+    }
+
+
+    // ⭐ 4. NEW FUNCTION: Shows a warning dialog when the user tries to exit.
+    private fun showExitWarningDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_exit_warning, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val btnConfirmExit: Button = dialogView.findViewById(R.id.btnExitConfirm)
+        val btnCancel: Button = dialogView.findViewById(R.id.btnExitCancel)
+
+        btnConfirmExit.setOnClickListener {
+            dialog.dismiss()
+            // Process, save, and exit prematurely.
+            processAndSaveFinalResult(isPrematureExit = true)
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    // ⭐ 5. NEW FUNCTION: Central place to handle saving the score and exiting.
+    // In processAndSaveFinalResult()
+
+    private fun processAndSaveFinalResult(isPrematureExit: Boolean) {
+        if (levelFinished) return
+
+        levelFinished = true
+        countDownTimer?.cancel()
+        recalculateScore()
+        saveFinalScore("TULA", 1, score)
+
+        // ⭐ SAVE THE TIME TAKEN
+        val timeRemaining = timerText.text.toString()
+        val totalTime = 10 * 60 // 10 minutes in seconds
+        val parts = timeRemaining.split(":")
+        val remainingSeconds = if (parts.size == 2) {
+            parts[0].toInt() * 60 + parts[1].toInt()
+        } else {
+            0
+        }
+        val timeTakenSeconds = totalTime - remainingSeconds
+
+        // Mark the level as permanently finished and save time
+        getSharedPreferences(prefsName, MODE_PRIVATE).edit().apply {
+            putBoolean(keyLevelFinished, true)
+            putInt(keyTimeTaken, timeTakenSeconds) // Save time in seconds
+            apply()
+        }
+
+        // ... rest of the function is the same
+        val resultIntent = Intent().apply {
+            putExtra("paksa_id", "tula")
+            putExtra("level_completed", 1)
+            putExtra("score", score)
+        }
+        setResult(Activity.RESULT_OK, resultIntent)
+
+        if (isPrematureExit) {
+            Toast.makeText(this, "Your progress has been saved.", Toast.LENGTH_SHORT).show()
+            finish()
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle("Level Completed!")
+                .setMessage("Your final score is $score / 10")
+                .setPositiveButton("OK") { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
+        }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Cancel the timer to prevent memory leaks when the activity is destroyed.
+        countDownTimer?.cancel()
     }
 
     private fun startTimer(timeInMillis: Long) {
+        if (timerStarted) return
+        timerStarted = true
         countDownTimer = object : CountDownTimer(timeInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val minutes = (millisUntilFinished / 1000) / 60
@@ -80,9 +221,7 @@ class TULA_level1 : AppCompatActivity() {
             override fun onFinish() {
                 timerText.text = "Time's up!"
                 disableAllCells()
-                if (!levelFinished) {
-                    finishLevel()
-                }
+                processAndSaveFinalResult(isPrematureExit = false)
             }
         }.start()
     }
@@ -135,10 +274,7 @@ class TULA_level1 : AppCompatActivity() {
                     setBackgroundColor(Color.WHITE)
                     isEnabled = true
                     setOnClickListener {
-                        if (!timerStarted) {
-                            startTimer(10 * 60 * 1000) // 10 minutes
-                            timerStarted = true
-                        }
+                        startTimer(10 * 60 * 1000) // 10 minutes
                         showWordDialog(word)
                     }
                 }
@@ -146,48 +282,35 @@ class TULA_level1 : AppCompatActivity() {
         }
     }
 
-// In TULA_level1.kt
-
     private fun showWordDialog(word: Word) {
-        // 1. Inflate the custom layout we just created
         val dialogView = layoutInflater.inflate(R.layout.dialog_crossword_input, null)
-
-        // 2. Create the AlertDialog builder
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
 
-        // 3. Create the dialog and make its background transparent to show the CardView's rounded corners
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        // 4. Get the views from inside our custom layout
         val clueView = dialogView.findViewById<TextView>(R.id.dialogClue)
         val input = dialogView.findViewById<EditText>(R.id.dialogInput)
         val btnSubmit = dialogView.findViewById<Button>(R.id.btnDialogSubmit)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnDialogCancel)
 
-        // Set the clue text dynamically
         clueView.text = word.clue
 
-        // 5. Set the click listener for the Submit button
         btnSubmit.setOnClickListener {
             val answer = input.text.toString().trim().uppercase()
             if (answer == word.text) {
                 fillWord(word, isNewAnswer = true)
                 Toast.makeText(this, "✅ Tama!", Toast.LENGTH_SHORT).show()
-                dialog.dismiss() // Close the dialog on correct answer
+                dialog.dismiss()
             } else {
                 Toast.makeText(this, "❌ Mali! Subukan muli.", Toast.LENGTH_SHORT).show()
-                // We don't dismiss the dialog, so the user can try again
             }
         }
 
-        // 6. Set the click listener for the Cancel button
         btnCancel.setOnClickListener {
-            dialog.dismiss() // Just close the dialog
+            dialog.dismiss()
         }
-
-        // 7. Show the beautiful new dialog
         dialog.show()
     }
 
@@ -204,49 +327,19 @@ class TULA_level1 : AppCompatActivity() {
         }
 
         if (isNewAnswer) {
-            // ⭐ FIX: Save the word state BEFORE checking for completion
             saveWordState(word)
-
-            // Recalculate score from scratch to ensure accuracy
             recalculateScore()
 
-            // Now check if all words are completed
-            if (words.all { wordCompleted(it) } && !levelFinished) {
-                countDownTimer?.cancel()
-                finishLevel()
+            // Check if all words are completed
+            if (words.all { wordCompleted(it) }) {
+                processAndSaveFinalResult(isPrematureExit = false)
             }
         }
     }
 
     private fun wordCompleted(word: Word): Boolean {
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         return sharedPref.getBoolean("word_${word.text}_completed", false)
-    }
-
-    private fun finishLevel() {
-        // Prevent this function from running more than once
-        if (levelFinished) return
-        levelFinished = true
-
-        // Ensure score is correct before finishing
-        recalculateScore()
-
-        // Save the final score to the correct "UserScores" file
-        saveFinalScore("TULA", 1, score)
-
-        val resultIntent = Intent().apply {
-            putExtra("paksa_id", "tula")
-            putExtra("level_completed", 1)
-            putExtra("score", score)
-        }
-        setResult(Activity.RESULT_OK, resultIntent)
-
-        AlertDialog.Builder(this)
-            .setTitle("Level Completed!")
-            .setMessage("Your final score is $score / 10")
-            .setPositiveButton("OK") { _, _ -> finish() }
-            .setCancelable(false)
-            .show()
     }
 
     private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
@@ -258,32 +351,29 @@ class TULA_level1 : AppCompatActivity() {
     }
 
     private fun saveWordState(word: Word) {
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         sharedPref.edit().putBoolean("word_${word.text}_completed", true).apply()
     }
 
-    // ⭐ FIX: Renamed this function for clarity and purpose
     private fun loadSavedState() {
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         for (word in words) {
             if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
                 fillWord(word, isNewAnswer = false)
             }
         }
-        // Recalculate score based on loaded state
         recalculateScore()
     }
 
-    // ⭐ FIX: New function to reliably calculate the score
     private fun recalculateScore() {
         var currentScore = 0
-        val sharedPref = getSharedPreferences("TULA_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         for (word in words) {
             if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
                 currentScore += 2
             }
         }
         score = currentScore
-        scoreText.text = if (score > 0) "Score: $score / 10" else ""
+        scoreText.text = if (score > 0) "Score: $score / 10" else "Score: 0 / 10"
     }
 }

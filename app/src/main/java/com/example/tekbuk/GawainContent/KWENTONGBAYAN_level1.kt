@@ -11,9 +11,9 @@ import android.text.InputFilter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.GridLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,6 +32,11 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
     private val gridSize = 15
     private val cells = Array(gridSize) { arrayOfNulls<EditText>(gridSize) }
     private var levelFinished = false
+
+    // SharedPreferences keys
+    private val prefsName = "KWENTONGBAYAN_Level1_Progress"
+    private val keyLevelFinished = "LevelFinishedPermanently"
+    private val keyTimeTaken = "TimeTaken"
 
     data class Word(
         val text: String,
@@ -60,15 +65,123 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
             insets
         }
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (!levelFinished) {
+                    showExitWarningDialog()
+                } else {
+                    finish()
+                }
+            }
+        })
+
         timerText = findViewById(R.id.timer)
         scoreText = findViewById(R.id.score)
         crosswordGrid = findViewById(R.id.crosswordGrid)
 
-        buildGrid()
-        loadSavedState()
+        val prefs = getSharedPreferences(prefsName, MODE_PRIVATE)
+        if (prefs.getBoolean(keyLevelFinished, false)) {
+            levelFinished = true
+            showAlreadyCompletedDialog()
+        } else {
+            buildGrid()
+            loadSavedState()
+        }
+    }
+
+    private fun showAlreadyCompletedDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_level_completed, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val tvScore = dialogView.findViewById<TextView>(R.id.tvDialogScore)
+        val tvTime = dialogView.findViewById<TextView>(R.id.tvDialogTime)
+        val btnOk = dialogView.findViewById<Button>(R.id.btnDialogOk)
+
+        val userScoresPrefs = getSharedPreferences("UserScores", MODE_PRIVATE)
+        val savedScore = userScoresPrefs.getInt("KWENTONG_BAYAN_LEVEL_1", 0)
+        val timeTakenSeconds = getSharedPreferences(prefsName, MODE_PRIVATE).getInt(keyTimeTaken, 0)
+
+        tvScore.text = "$savedScore / 10"
+        val minutes = timeTakenSeconds / 60
+        val seconds = timeTakenSeconds % 60
+        tvTime.text = String.format("%02d:%02d", minutes, seconds)
+
+        btnOk.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+
+        dialog.setCancelable(false)
+        dialog.show()
+    }
+
+    private fun showExitWarningDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_exit_warning, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val btnConfirmExit: Button = dialogView.findViewById(R.id.btnExitConfirm)
+        val btnCancel: Button = dialogView.findViewById(R.id.btnExitCancel)
+
+        btnConfirmExit.setOnClickListener {
+            dialog.dismiss()
+            processAndSaveFinalResult(isPrematureExit = true)
+        }
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        dialog.show()
+    }
+
+    private fun processAndSaveFinalResult(isPrematureExit: Boolean) {
+        if (levelFinished) return
+        levelFinished = true
+
+        countDownTimer?.cancel()
+        recalculateScore()
+        saveFinalScore("KWENTONG_BAYAN", 1, score)
+
+        val timeRemaining = timerText.text.toString()
+        val totalTime = 10 * 60
+        val parts = timeRemaining.split(":")
+        val remainingSeconds = if (parts.size == 2) parts[0].toInt() * 60 + parts[1].toInt() else 0
+        val timeTakenSeconds = totalTime - remainingSeconds
+
+        getSharedPreferences(prefsName, MODE_PRIVATE).edit().apply {
+            putBoolean(keyLevelFinished, true)
+            putInt(keyTimeTaken, timeTakenSeconds)
+            apply()
+        }
+
+        val resultIntent = Intent().apply {
+            putExtra("paksa_id", "kwentong_bayan")
+            putExtra("level_completed", 1)
+            putExtra("score", score)
+        }
+        setResult(Activity.RESULT_OK, resultIntent)
+
+        if (isPrematureExit) {
+            Toast.makeText(this, "Your progress has been saved.", Toast.LENGTH_SHORT).show()
+            finish()
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle("Level Completed!")
+                .setMessage("Your final score is $score / 10")
+                .setPositiveButton("OK") { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        countDownTimer?.cancel()
     }
 
     private fun startTimer(timeInMillis: Long) {
+        if(timerStarted) return
+        timerStarted = true
         countDownTimer = object : CountDownTimer(timeInMillis, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val minutes = (millisUntilFinished / 1000) / 60
@@ -79,9 +192,7 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
             override fun onFinish() {
                 timerText.text = "Time's up!"
                 disableAllCells()
-                if (!levelFinished) {
-                    finishLevel()
-                }
+                processAndSaveFinalResult(isPrematureExit = false)
             }
         }.start()
     }
@@ -134,10 +245,7 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
                     setBackgroundColor(Color.WHITE)
                     isEnabled = true
                     setOnClickListener {
-                        if (!timerStarted) {
-                            startTimer(10 * 60 * 1000)
-                            timerStarted = true
-                        }
+                        startTimer(10 * 60 * 1000)
                         showWordDialog(word)
                     }
                 }
@@ -145,46 +253,35 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
         }
     }
 
-    private fun showWordDialog(word: KWENTONGBAYAN_level1.Word) {
-        // 1. Inflate the custom layout we just created
+    private fun showWordDialog(word: Word) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_crossword_input, null)
-
-        // 2. Create the AlertDialog builder
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
 
-        // 3. Create the dialog and make its background transparent to show the CardView's rounded corners
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        // 4. Get the views from inside our custom layout
         val clueView = dialogView.findViewById<TextView>(R.id.dialogClue)
         val input = dialogView.findViewById<EditText>(R.id.dialogInput)
         val btnSubmit = dialogView.findViewById<Button>(R.id.btnDialogSubmit)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnDialogCancel)
 
-        // Set the clue text dynamically
         clueView.text = word.clue
 
-        // 5. Set the click listener for the Submit button
         btnSubmit.setOnClickListener {
             val answer = input.text.toString().trim().uppercase()
             if (answer == word.text) {
                 fillWord(word, isNewAnswer = true)
                 Toast.makeText(this, "✅ Tama!", Toast.LENGTH_SHORT).show()
-                dialog.dismiss() // Close the dialog on correct answer
+                dialog.dismiss()
             } else {
                 Toast.makeText(this, "❌ Mali! Subukan muli.", Toast.LENGTH_SHORT).show()
-                // We don't dismiss the dialog, so the user can try again
             }
         }
 
-        // 6. Set the click listener for the Cancel button
         btnCancel.setOnClickListener {
-            dialog.dismiss() // Just close the dialog
+            dialog.dismiss()
         }
-
-        // 7. Show the beautiful new dialog
         dialog.show()
     }
 
@@ -202,37 +299,15 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
         if (isNewAnswer) {
             saveWordState(word)
             recalculateScore()
-            if (words.all { wordCompleted(it) } && !levelFinished) {
-                countDownTimer?.cancel()
-                finishLevel()
+            if (words.all { wordCompleted(it) }) {
+                processAndSaveFinalResult(isPrematureExit = false)
             }
         }
     }
 
     private fun wordCompleted(word: Word): Boolean {
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         return sharedPref.getBoolean("word_${word.text}_completed", false)
-    }
-
-    private fun finishLevel() {
-        if (levelFinished) return
-        levelFinished = true
-        recalculateScore()
-        saveFinalScore("KWENTONG_BAYAN", 1, score)
-
-        val resultIntent = Intent().apply {
-            putExtra("paksa_id", "kwentong_bayan")
-            putExtra("level_completed", 1)
-            putExtra("score", score)
-        }
-        setResult(Activity.RESULT_OK, resultIntent)
-
-        AlertDialog.Builder(this)
-            .setTitle("Level Completed!")
-            .setMessage("Your final score is $score / 10")
-            .setPositiveButton("OK") { _, _ -> finish() }
-            .setCancelable(false)
-            .show()
     }
 
     private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
@@ -242,13 +317,12 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
     }
 
     private fun saveWordState(word: Word) {
-        // ⭐ [FIX] Use the correct SharedPreferences file name to match the other functions
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         sharedPref.edit().putBoolean("word_${word.text}_completed", true).apply()
     }
 
     private fun loadSavedState() {
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         for (word in words) {
             if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
                 fillWord(word, isNewAnswer = false)
@@ -259,13 +333,13 @@ class KWENTONGBAYAN_level1 : AppCompatActivity() {
 
     private fun recalculateScore() {
         var currentScore = 0
-        val sharedPref = getSharedPreferences("KWENTONGBAYAN_Level1_Progress", MODE_PRIVATE)
+        val sharedPref = getSharedPreferences(prefsName, MODE_PRIVATE)
         for (word in words) {
             if (sharedPref.getBoolean("word_${word.text}_completed", false)) {
                 currentScore += 2
             }
         }
         score = currentScore
-        scoreText.text = if (score > 0) "Score: $score / 10" else ""
+        scoreText.text = if (score > 0) "Score: $score / 10" else "Score: 0 / 10"
     }
 }

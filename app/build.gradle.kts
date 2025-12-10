@@ -53,14 +53,24 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.gridlayout)
-    implementation(libs.firebase.auth)
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
-    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // --- Firebase & Google Authentication (Corrected Block) ---
+
+    // 1. Import the Firebase Bill of Materials (BoM)
+    // This manages versions for all Firebase libraries to ensure compatibility.
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0")) // Updated to a recent stable version
+
+    // 2. Add the specific Firebase products you need (without versions).
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-firestore")
+
+    // 3. Add the Google Sign-In library (part of Play Services, not Firebase BoM)
+    implementation("com.google.android.gms:play-services-auth:21.2.0") // Updated to a recent stable version
+
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
@@ -69,5 +79,4 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 
-    implementation ("com.google.android.material:material:1.2.0=alpha04")
 }
