@@ -98,49 +98,204 @@ class TeacherDashboardActivity : AppCompatActivity() {
 
     private fun showStudentDetailsDialog(student: StudentResult) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("${student.studentName} (${student.section})")
+        // We will set a custom title view inside the layout, so we don't set title here to keep it cleaner
 
-        // Construct the detailed message manually
-        val sb = StringBuilder()
-        sb.append("Total Score: ${student.total_score}\n")
-        sb.append("Pagtataya: ${student.pagtataya_score}/30\n\n")
+        // 1. Root ScrollView (To ensure it fits on screen)
+        val scrollView = ScrollView(this)
+        scrollView.setBackgroundColor(resources.getColor(R.color.fourpointfive)) // App Background Color
 
-        sb.append("--- MGA PAKSA ---\n")
+        // 2. Main Container (LinearLayout)
+        val mainContainer = android.widget.LinearLayout(this)
+        mainContainer.orientation = android.widget.LinearLayout.VERTICAL
+        mainContainer.setPadding(40, 40, 40, 40) // Add breathing room
+
+        // --- HEADER SECTION (Name & Section) ---
+        val tvName = TextView(this)
+        tvName.text = student.studentName.uppercase()
+        tvName.textSize = 20f
+        tvName.setTypeface(null, android.graphics.Typeface.BOLD)
+        tvName.setTextColor(resources.getColor(R.color.black))
+        tvName.gravity = android.view.Gravity.CENTER
+        mainContainer.addView(tvName)
+
+        val tvSection = TextView(this)
+        tvSection.text = student.section
+        tvSection.textSize = 16f
+        tvSection.setTextColor(resources.getColor(R.color.one)) // Accent Color
+        tvSection.gravity = android.view.Gravity.CENTER
+        tvSection.setPadding(0, 0, 0, 30) // Bottom margin
+        mainContainer.addView(tvSection)
+
+        // --- SCORE SUMMARY CARD ---
+        val summaryCard = androidx.cardview.widget.CardView(this)
+        summaryCard.radius = 30f
+        summaryCard.cardElevation = 10f
+        summaryCard.setCardBackgroundColor(resources.getColor(R.color.white))
+
+        val summaryParams = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        summaryParams.setMargins(10, 10, 10, 40) // Margin bottom
+        summaryCard.layoutParams = summaryParams
+
+        val summaryLayout = android.widget.LinearLayout(this)
+        summaryLayout.orientation = android.widget.LinearLayout.VERTICAL
+        summaryLayout.setPadding(30, 30, 30, 30)
+
+        val tvTotalLabel = TextView(this)
+        tvTotalLabel.text = "OVERALL SCORE"
+        tvTotalLabel.gravity = android.view.Gravity.CENTER
+        tvTotalLabel.textSize = 12f
+        summaryLayout.addView(tvTotalLabel)
+
+        val tvTotalScore = TextView(this)
+        tvTotalScore.text = "${student.total_score}"
+        tvTotalScore.textSize = 32f
+        tvTotalScore.setTypeface(null, android.graphics.Typeface.BOLD)
+        tvTotalScore.setTextColor(resources.getColor(R.color.one))
+        tvTotalScore.gravity = android.view.Gravity.CENTER
+        summaryLayout.addView(tvTotalScore)
+
+        val tvPagtataya = TextView(this)
+        tvPagtataya.text = "Pagtataya: ${student.pagtataya_score} / 30"
+        tvPagtataya.gravity = android.view.Gravity.CENTER
+        tvPagtataya.textSize = 14f
+        tvPagtataya.setPadding(0, 10, 0, 0)
+        summaryLayout.addView(tvPagtataya)
+
+        summaryCard.addView(summaryLayout)
+        mainContainer.addView(summaryCard)
+
+
+        // --- TOPICS LOOP ---
         val topics = listOf("tula", "sanaysay", "dagli", "talumpati", "kwentong_bayan")
 
         for (topic in topics) {
-            // 1. Get scores safely (Cast to Number first to handle Long/Int from Firestore)
-            val l1 = (student.rawData["${topic}_l1"] as? Number)?.toInt() ?: 0
-            val l2 = (student.rawData["${topic}_l2"] as? Number)?.toInt() ?: 0
-            val l3Answer = student.rawData["${topic}_l3_answer"] as? String ?: "No Answer"
+            // Check if data exists for this topic to avoid empty boxes
+            if (student.rawData.containsKey("${topic}_l1") || student.rawData.containsKey("${topic}_l3_answer")) {
 
-            // 2. Calculate the Total for this specific Paksa
-            val topicTotal = l1 + l2
+                val l1 = (student.rawData["${topic}_l1"] as? Number)?.toInt() ?: 0
+                val l2 = (student.rawData["${topic}_l2"] as? Number)?.toInt() ?: 0
+                val l3Answer = student.rawData["${topic}_l3_answer"] as? String ?: "No Answer"
+                val topicTotal = l1 + l2
 
-            // 3. Display with the calculated total
-            sb.append("${topic.uppercase()} (Total: $topicTotal pts):\n")
-            sb.append("  Level 1: $l1\n")
-            sb.append("  Level 2: $l2\n")
-            sb.append("  Repleksyon: \"$l3Answer\"\n\n")
+                // Topic Header
+                val tvTopicTitle = TextView(this)
+                tvTopicTitle.text = "${topic.uppercase()} (Quiz: $topicTotal pts)"
+                tvTopicTitle.textSize = 16f
+                tvTopicTitle.setTypeface(null, android.graphics.Typeface.BOLD)
+                tvTopicTitle.setTextColor(resources.getColor(R.color.black))
+                tvTopicTitle.setPadding(0, 20, 0, 10)
+                mainContainer.addView(tvTopicTitle)
+
+                // Scores Row
+                val tvScores = TextView(this)
+                tvScores.text = "Level 1: $l1  |  Level 2: $l2"
+                tvScores.textSize = 14f
+                tvScores.setTextColor(resources.getColor(R.color.one))
+                tvScores.setPadding(0, 0, 0, 10)
+                mainContainer.addView(tvScores)
+
+                // Essay Box (Styled visually)
+                val essayContainer = android.widget.LinearLayout(this)
+                essayContainer.orientation = android.widget.LinearLayout.VERTICAL
+                essayContainer.setBackgroundResource(R.drawable.edittext_bg) // Reusing your existing drawable if available, or use color
+                // If edittext_bg doesn't exist, use: essayContainer.setBackgroundColor(android.graphics.Color.WHITE)
+                essayContainer.setPadding(25, 25, 25, 25)
+
+                // Add margins to the essay box
+                val essayParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                essayParams.setMargins(0, 0, 0, 30) // Spacing after topic
+                essayContainer.layoutParams = essayParams
+
+                val tvEssayLabel = TextView(this)
+                tvEssayLabel.text = "Repleksyon / Essay:"
+                tvEssayLabel.textSize = 12f
+                tvEssayLabel.setTypeface(null, android.graphics.Typeface.ITALIC)
+                essayContainer.addView(tvEssayLabel)
+
+                // --- FIX FOR WRAPPING TEXT (Inside Loop) ---
+                val tvEssayBody = TextView(this)
+                tvEssayBody.text = l3Answer
+                tvEssayBody.setTextColor(resources.getColor(R.color.black))
+                tvEssayBody.textSize = 14f
+                tvEssayBody.setPadding(0, 10, 0, 0)
+
+                // 1. Allow multiple lines
+                tvEssayBody.isSingleLine = false
+                // 2. Set InputType to Text + MultiLine
+                tvEssayBody.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+                // 3. Set layout params to WRAP_CONTENT
+                tvEssayBody.layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+
+                essayContainer.addView(tvEssayBody)
+                mainContainer.addView(essayContainer)
+            }
         }
 
-        sb.append("--- MAIN REPLEKSYON ---\n")
+        // --- MAIN REPLEKSYON SECTION ---
         val mainRep = student.rawData["repleksyon_main_answer"] as? String ?: "Not Submitted"
-        sb.append(mainRep)
 
-        // Show inside a scrollable view
-        val scrollView = ScrollView(this)
-        val textView = TextView(this)
-        textView.text = sb.toString()
-        textView.setPadding(50, 40, 50, 40)
-        textView.textSize = 16f
-        textView.setTextColor(resources.getColor(android.R.color.black))
-        scrollView.addView(textView)
+        val tvMainRepTitle = TextView(this)
+        tvMainRepTitle.text = "MAIN REPLEKSYON"
+        tvMainRepTitle.textSize = 18f
+        tvMainRepTitle.setTypeface(null, android.graphics.Typeface.BOLD)
+        tvMainRepTitle.setTextColor(resources.getColor(R.color.one))
+        tvMainRepTitle.setPadding(0, 20, 0, 10)
+        mainContainer.addView(tvMainRepTitle)
 
+        val repContainer = android.widget.LinearLayout(this)
+        repContainer.orientation = android.widget.LinearLayout.VERTICAL
+        repContainer.setBackgroundColor(resources.getColor(R.color.white)) // Or R.drawable.edittext_bg
+        repContainer.setPadding(30, 30, 30, 30)
+
+        val repParams = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        repParams.setMargins(0, 0, 0, 20)
+        repContainer.layoutParams = repParams
+
+        // --- FIX FOR WRAPPING TEXT ---
+        val tvRepBody = TextView(this)
+        tvRepBody.text = mainRep
+        tvRepBody.textSize = 15f
+        tvRepBody.setTextColor(resources.getColor(R.color.black))
+        // 1. Force SingleLine to FALSE
+        tvRepBody.isSingleLine = false
+        // 2. Set InputType to MultiLine
+        tvRepBody.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        // 3. Ensure layout params assume wrapping
+        tvRepBody.layoutParams = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        repContainer.addView(tvRepBody)
+        mainContainer.addView(repContainer)
+
+        // Add Main Container to ScrollView
+        scrollView.addView(mainContainer)
+
+        // Set View and Buttons
         builder.setView(scrollView)
         builder.setPositiveButton("Close") { dialog, _ -> dialog.dismiss() }
-        builder.show()
+
+        // Optional: Customize Button Color
+        val dialog = builder.create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.one))
+        }
+        dialog.show()
     }
+
 }
 data class StudentResult(
     val id: String = "",
