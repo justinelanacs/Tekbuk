@@ -29,6 +29,18 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="20dp" />
 
+            <!-- Inside your LinearLayout -->
+            <EditText
+                android:id="@+id/etDialogEmail"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/edittext_bg"
+                android:hint="Email Address"
+                android:inputType="textEmailAddress"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/black" />
+
             <!-- ⭐ MODIFIED: Replaced EditText with TextInputLayout ⭐ -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
