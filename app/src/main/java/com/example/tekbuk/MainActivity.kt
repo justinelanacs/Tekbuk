@@ -1,10 +1,14 @@
 package com.example.tekbuk
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -21,37 +25,79 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // ✅ Handle system bars properly
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // ✅ Set click actions for each card (fixed positions)
-        findViewById<View>(R.id.cardPaksa).setOnClickListener {
+        setupClickListeners()
+    }
+
+    private fun setupClickListeners() {
+        // Use binding to access views for better performance and type safety
+        binding.cardPaksa.setOnClickListener {
             startActivity(Intent(this, PaksaPageActivity::class.java))
         }
 
-        findViewById<View>(R.id.cardGawain).setOnClickListener {
+        binding.cardGawain.setOnClickListener {
             startActivity(Intent(this, GawainPageActivity::class.java))
         }
 
-        findViewById<View>(R.id.cardPagtataya).setOnClickListener {
+        binding.cardPagtataya.setOnClickListener {
             startActivity(Intent(this, PagtatayaPageActivity::class.java))
         }
 
-        findViewById<View>(R.id.cardRepleksyon).setOnClickListener {
-            startActivity(Intent(this, RepleksyonPageActivity::class.java))
+        // ⭐ MODIFIED THIS CLICK LISTENER
+        binding.cardRepleksyon.setOnClickListener {
+            // Check if all "Paksa" topics are 100% complete
+            if (areAllPaksaCompleted()) {
+                // If complete, open the Repleksyon page
+                startActivity(Intent(this, RepleksyonPageActivity::class.java))
+            } else {
+                // If not complete, show the pop-up dialog
+                showPaksaIncompleteDialog()
+            }
         }
 
-        findViewById<View>(R.id.cardMarka).setOnClickListener {
+        binding.cardMarka.setOnClickListener {
             startActivity(Intent(this, MarkaPageActivity::class.java))
         }
 
-        // ✅ Make menuButton clickable
-        findViewById<ImageView>(R.id.menuButton).setOnClickListener {
+        binding.menuButton.setOnClickListener {
             startActivity(Intent(this, SettingsPage::class.java))
         }
+    }
+
+    /**
+     * Checks SharedPreferences to see if all Paksa topics have a progress of 100.
+     */
+    private fun areAllPaksaCompleted(): Boolean {
+        // List of all topic keys used in SharedPreferences
+        val topics = listOf("TULA", "SANAYSAY", "DAGLI", "TALUMPATI", "KWENTONG BAYAN")
+        val prefs = getSharedPreferences("PaksaProgress", Context.MODE_PRIVATE)
+
+        // The '.all' function checks if the condition is true for every item in the list.
+        // It will return false as soon as it finds one topic that is not 100.
+        return topics.all { topic ->
+            prefs.getInt("${topic}_progress", 0) == 100
+        }
+    }
+
+    /**
+     * Displays a custom CardView dialog informing the user to complete all topics.
+     */
+    private fun showPaksaIncompleteDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_paksa_incomplete, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val btnUnderstood: Button = dialogView.findViewById(R.id.btnDialogUnderstood)
+        btnUnderstood.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

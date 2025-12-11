@@ -43,7 +43,7 @@ class RepleksyonPageActivity : AppCompatActivity() {
             val answer = etReflection.text.toString().trim()
 
             if (answer.isEmpty()) {
-                Toast.makeText(this, "Please write your reflection first.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Maglagay muna ng nilalaman", Toast.LENGTH_SHORT).show()
             } else {
                 // 4. SAVE THE DATA
                 // We use the same 'UserScores' preference file used in MarkaPageActivity
@@ -57,7 +57,7 @@ class RepleksyonPageActivity : AppCompatActivity() {
 
                 editor.apply()
 
-                Toast.makeText(this, "Repleksyon saved successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Na-save nang matagumpay ang iyong repleksyon!", Toast.LENGTH_SHORT).show()
                 finish() // Close the activity and go back
             }
         }

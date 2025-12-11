@@ -2,7 +2,6 @@ package com.example.tekbuk.HomepageContent
 
 import android.content.Context
 import android.os.Bundle
-import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -11,11 +10,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.tekbuk.R
 import com.example.tekbuk.adapter.PaksaAdapter
 import com.example.tekbuk.model.PaksaItem
-import com.example.tekbuk.PaksaContent.*
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
+// ⭐ 1. REMOVED ScrollProgressListener - It's no longer needed here.
+class PaksaPageActivity : AppCompatActivity() {
 
     private lateinit var dotIndicator: TabLayout
     private lateinit var viewPager: ViewPager2
@@ -48,7 +47,6 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
             PaksaItem("SANAYSAY", readRawText(R.raw.sanaysay_desc), R.drawable.sanaysay, 0),
             PaksaItem("DAGLI", readRawText(R.raw.dagli_desc), R.drawable.dagli, 0),
             PaksaItem("TALUMPATI", readRawText(R.raw.talumpati_desc), R.drawable.talumpati, 0),
-            // ⭐ Use a consistent ID for Kwentong Bayan to make saving easier
             PaksaItem("KWENTONG BAYAN", readRawText(R.raw.kwentongbayan_desc), R.drawable.kwentongbayan, 0)
         )
 
@@ -61,25 +59,31 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
         viewPager.clipChildren = false
         viewPager.getChildAt(0).overScrollMode = ViewPager2.OVER_SCROLL_NEVER
 
-        // Page transform (spacing + scale effect)
-        val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.viewpager_page_margin)
-        val offsetPx = resources.getDimensionPixelOffset(R.dimen.viewpager_offset)
-        viewPager.setPadding(offsetPx, 0, offsetPx, 0)
         viewPager.setPageTransformer { page, position ->
-            val offset = position * -(0 * offsetPx + pageMarginPx)
+            // Get the offsetPx and pageMarginPx again inside the transformer for clarity
+            val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.viewpager_page_margin)
+            val offsetPx = resources.getDimensionPixelOffset(R.dimen.viewpager_offset)
+
+            // This is the key calculation for translation
+            // It moves the page based on its natural position and the desired margins/offsets
+            val viewPagerMarginOffset = pageMarginPx + offsetPx
+            val offset = position * -viewPagerMarginOffset
+
             page.translationX = offset
-            val scale = 0.85f + (1 - kotlin.math.abs(position)) * 0.15f
-            page.scaleY = scale
+
+            // Your scaling logic is perfect and remains the same
+            val scaleFactor = 0.85f + (1 - kotlin.math.abs(position)) * 0.15f
+            page.scaleY = scaleFactor
+            page.scaleX = scaleFactor // It's good practice to scale both X and Y for a uniform look
         }
 
         // Attach TabLayout as dot indicator
         TabLayoutMediator(dotIndicator, viewPager) { _, _ -> }.attach()
 
-        // Set scroll listener for live progress updates
-        BaseContentActivity.scrollListener = this
+        // ⭐ 2. REMOVED THE SCROLL LISTENER - It is no longer set here.
     }
 
-    // ⭐ ADDED: onResume is the best place to load data that needs to be fresh
+    // onResume is the best place to load data that needs to be fresh
     override fun onResume() {
         super.onResume()
         // Load the saved progress every time the user returns to this screen
@@ -87,14 +91,13 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
     }
 
     /**
-     * ⭐ ADDED: Loads progress for all paksa items from SharedPreferences.
+     * Loads progress for all paksa items from SharedPreferences.
      */
     private fun loadProgress() {
         val prefs = getSharedPreferences("PaksaProgress", Context.MODE_PRIVATE)
         var hasChanges = false
         for (item in paksaItems) {
-            // Create a unique key for each topic, e.g., "progress_TULA"
-            val key = "progress_${item.title}"
+            val key = "${item.title}_progress"
             val savedProgress = prefs.getInt(key, 0)
             if (item.progress != savedProgress) {
                 item.progress = savedProgress
@@ -104,29 +107,22 @@ class PaksaPageActivity : AppCompatActivity(), ScrollProgressListener {
 
         // Only update the adapter if any progress value actually changed
         if (hasChanges) {
+            // ⭐ FIX: Save the current item's position before resetting the adapter.
+            val currentPosition = viewPager.currentItem
+
             adapter.notifyDataSetChanged()
+
+            // Reset the adapter to fix the rendering bug
+            viewPager.adapter = null
+            viewPager.adapter = adapter
+
+            // ⭐ FIX: Restore the ViewPager to its previous position.
+            // The 'false' argument tells it to jump instantly without a smooth scroll animation.
+            viewPager.setCurrentItem(currentPosition, false)
         }
     }
 
-    /**
-     * ⭐ ADDED: Saves a specific topic's progress to SharedPreferences.
-     */
-    private fun saveProgress(paksaTitle: String, progress: Int) {
-        val prefs = getSharedPreferences("PaksaProgress", Context.MODE_PRIVATE)
-        val key = "progress_$paksaTitle"
-        prefs.edit().putInt(key, progress).apply()
-    }
-
-    // ⭐ UPDATED: This function now also saves the progress
-    override fun onProgressUpdate(index: Int, progress: Int) {
-        if (index in paksaItems.indices) {
-            val item = paksaItems[index]
-            // Update the progress in memory
-            item.progress = progress
-            // Update the specific item in the adapter for a smooth animation
-            adapter.notifyItemChanged(index)
-            // Save the new progress to persistent storage
-            saveProgress(item.title, progress)
-        }
-    }
+    // ⭐ 4. REMOVED saveProgress() and onProgressUpdate()
+    // These functions are no longer needed in this activity.
 }
+

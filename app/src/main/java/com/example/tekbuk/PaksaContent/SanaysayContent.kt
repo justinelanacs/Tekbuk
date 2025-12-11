@@ -1,17 +1,23 @@
 package com.example.tekbuk.PaksaContent
 
 import android.view.Gravity
-import com.example.tekbuk.R
+import com.example.tekbuk.R // 1. Add this import
 
 class SanaysayContent : BaseContentActivity() {
 
-    // IMPORTANT: Make sure this points to the correct content file for Sanaysay!
-    override val contentRawRes: Int = R.raw.sanaysaycontent
+    override val contentRawRes: Int
+        get() = R.raw.sanaysaycontent // Make sure filename matches
 
-    override val pageTitle: String = "SANAYSAY"
-    override val pageSubtitle: String = "SUMANlangit Nawa"
+    override val pageTitle: String
+        get() = "SANAYSAY"
 
-    // Provide the alignment value. NO_GRAVITY allows the XML's "inter_word" to work.
-    // If "inter_word" isn't working, use Gravity.START for standard left-alignment.
-    override val textAlignment: Int = Gravity.NO_GRAVITY
+    override val pageSubtitle: String
+        get() = "Pagpapahayag ng Opinyon"
+
+    override val textAlignment: Int
+        get() = Gravity.START
+
+    // 2. Add this override
+    override val topicKey: String
+        get() = "SANAYSAY"
 }

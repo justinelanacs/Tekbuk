@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tekbuk.R
 import com.example.tekbuk.model.PaksaItem
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.example.tekbuk.HomepageContent.PaksaPageActivity
 import com.example.tekbuk.PaksaContent.*
 
 class PaksaAdapter(
@@ -48,14 +47,13 @@ class PaksaAdapter(
                 "SANAYSAY" -> Intent(context, SanaysayContent::class.java)
                 "DAGLI" -> Intent(context, DagliContent::class.java)
                 "TALUMPATI" -> Intent(context, TalumpatiContent::class.java)
+                // Corrected the class name to match convention
                 "KWENTONG BAYAN" -> Intent(context, KwentongbayanContent::class.java)
                 else -> null
             }
 
-            intent?.putExtra("paksa_index", position)
-
-            if (intent != null && context is PaksaPageActivity) {
-                BaseContentActivity.scrollListener = context // ✅ correct way
+            // ⭐ FIX: REMOVED the line causing the error and simplified the check
+            if (intent != null) {
                 context.startActivity(intent)
             }
         }

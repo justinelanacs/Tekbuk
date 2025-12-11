@@ -239,14 +239,19 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- REPLEKSYON Section (Updated Style) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardRepleksyon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:visibility="gone"> <!-- The code will make this visible -->
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="4dp"
+                tools:visibility="visible">
 
                 <LinearLayout
+                    android:background="@drawable/mainbutton_bg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -255,20 +260,43 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pangkalahatang Repleksyon"
-                        android:textAppearance="?attr/textAppearanceHeadline6" />
+                        android:textSize="20sp"
+                        android:layout_gravity="center_horizontal"
+                        android:text="REPLEKSYON"
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/textViewRepleksyonStatus"
-                        android:layout_width="wrap_content"
+                    <!-- Status -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Pending"
-                        android:textAppearance="?attr/textAppearanceBody2" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Status:"
+                            android:textSize="16sp"
+                            android:textAppearance="?attr/textAppearanceBody1" />
+
+                        <TextView
+                            android:id="@+id/textViewRepleksyonStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:paddingStart="16dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="4dp"
+                            tools:text="Naipasa na"
+                            android:textAppearance="?attr/textAppearanceBody1" />
+                    </LinearLayout>
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
+
 
             <!-- TULA Section -->
             <com.google.android.material.card.MaterialCardView

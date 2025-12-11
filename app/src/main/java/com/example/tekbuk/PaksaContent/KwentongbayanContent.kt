@@ -1,16 +1,23 @@
 package com.example.tekbuk.PaksaContent
 
 import android.view.Gravity
-import com.example.tekbuk.R
+import com.example.tekbuk.R // 1. Add this import
 
 class KwentongbayanContent : BaseContentActivity() {
 
-    // ⭐ FIX 1: Point to the correct Kwentong Bayan content file.
-    override val contentRawRes: Int = R.raw.kwentongbayancontent
+    override val contentRawRes: Int
+        get() = R.raw.kwentongbayancontent // Make sure filename matches
 
-    override val pageTitle: String = "KWENTONG BAYAN"
-    override val pageSubtitle: String = "ANG ALAMAT NG MANGUMIT"
+    override val pageTitle: String
+        get() = "KWENTONG BAYAN"
 
-    // ⭐ FIX 2: Provide the alignment value for justified text.
-    override val textAlignment: Int = Gravity.NO_GRAVITY
+    override val pageSubtitle: String
+        get() = "Mga Salaysay ng Ating Lahi"
+
+    override val textAlignment: Int
+        get() = Gravity.START
+
+    // 2. Add this override
+    override val topicKey: String
+        get() = "KWENTONG BAYAN" // Use underscore to match the check in MainActivity
 }
