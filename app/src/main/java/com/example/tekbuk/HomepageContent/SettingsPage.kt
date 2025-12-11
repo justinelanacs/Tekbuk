@@ -8,41 +8,32 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.tekbuk.R
 import com.example.tekbuk.databinding.ActivitySettingsPageBinding
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 
 class SettingsPage : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsPageBinding
+    // Key for storing the teacher password
     private val teacherPrefsName = "TeacherProfile"
     private val keyTeacherPassword = "TeacherPassword"
 
-    // --- ⭐ 1. NEW: DECLARE GOOGLE SIGN-IN CLIENT AND LAUNCHER ---
-    private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
-    private val authorizedEmail = "justinelana6@gmail.com"
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
         binding = ActivitySettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // No need to apply insets again if done in XML with fitsSystemWindows
-        // ViewCompat.setOnApplyWindowInsetsListener(...)
-
-        // --- ⭐ 2. NEW: CONFIGURE GOOGLE SIGN-IN ---
-        configureGoogleSignIn()
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         loadUserProfile()
 
@@ -53,52 +44,6 @@ class SettingsPage : AppCompatActivity() {
         binding.btnAddName.setOnClickListener {
             showNameAndSectionDialog()
         }
-    }
-
-    private fun configureGoogleSignIn() {
-        // Configure Google Sign-In to request the user's ID, email address, and basic profile.
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .build()
-
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-        // Initialize the ActivityResultLauncher
-        googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                handleGoogleSignInResult(task)
-            } else {
-                Toast.makeText(this, "Google Sign-In cancelled.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun handleGoogleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-
-            // --- ⭐ 3. NEW: CHECK IF THE SIGNED-IN EMAIL IS THE AUTHORIZED ONE ---
-            if (account.email == authorizedEmail) {
-                Toast.makeText(this, "Authentication successful!", Toast.LENGTH_SHORT).show()
-                // Sign-out immediately so it asks for login next time
-                googleSignInClient.signOut().addOnCompleteListener {
-                    // Now that authentication is successful, show the change password dialog
-                    showChangePasswordDialog()
-                }
-            } else {
-                Toast.makeText(this, "Authentication Failed: This Google account is not authorized.", Toast.LENGTH_LONG).show()
-                // Sign out the unauthorized user
-                googleSignInClient.signOut()
-            }
-        } catch (e: ApiException) {
-            Toast.makeText(this, "Google Sign-In failed: ${e.statusCode}", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun startGoogleSignInFlow() {
-        val signInIntent = googleSignInClient.signInIntent
-        googleSignInLauncher.launch(signInIntent)
     }
 
     private fun loadUserProfile() {
@@ -116,17 +61,21 @@ class SettingsPage : AppCompatActivity() {
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
+        // Get views from the new layout
         val etPassword = dialogView.findViewById<EditText>(R.id.etDialogPassword)
         val btnLogin = dialogView.findViewById<Button>(R.id.btnDialogLogin)
         val tvChangePassword = dialogView.findViewById<TextView>(R.id.tvChangePassword)
 
+        // Get the saved password, with "administrator2025" as the default
         val prefs = getSharedPreferences(teacherPrefsName, Context.MODE_PRIVATE)
         val savedPassword = prefs.getString(keyTeacherPassword, "administrator2025")
 
+        // "PASOK" button logic
         btnLogin.setOnClickListener {
             val enteredPassword = etPassword.text.toString()
             if (enteredPassword == savedPassword) {
                 Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                // Open the new empty activity
                 startActivity(Intent(this, TeacherDashboardActivity::class.java))
                 dialog.dismiss()
             } else {
@@ -134,26 +83,21 @@ class SettingsPage : AppCompatActivity() {
             }
         }
 
-        // --- ⭐ 4. MODIFIED: "Change Password" now starts Google Sign-In ---
+        // "Change Password" text logic
         tvChangePassword.setOnClickListener {
-            dialog.dismiss() // Close the login dialog first
-            // Check if user is already signed in with the correct account
-            val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(this)
-            if (lastSignedInAccount != null && lastSignedInAccount.email == authorizedEmail) {
-                // If already authenticated, go directly to change password
-                showChangePasswordDialog()
-            } else {
-                // Otherwise, start the full sign-in flow
-                startGoogleSignInFlow()
-            }
+            dialog.dismiss() // Close the current dialog
+            showChangePasswordDialog() // Open the new one
         }
 
         dialog.show()
     }
 
     private fun showChangePasswordDialog() {
+        // Here we'll use a dialog with two password fields and a save button.
+        // I will design it programmatically for simplicity, but you can create a new XML.
         val newDialogView = layoutInflater.inflate(R.layout.dialog_change_password, null)
-        val builder = AlertDialog.Builder(this).setView(newDialogView)
+        val builder = AlertDialog.Builder(this)
+        builder.setView(newDialogView)
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
@@ -175,6 +119,7 @@ class SettingsPage : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // Save the new password to SharedPreferences
             val prefs = getSharedPreferences(teacherPrefsName, Context.MODE_PRIVATE)
             prefs.edit().putString(keyTeacherPassword, newPassword).apply()
 
@@ -186,8 +131,11 @@ class SettingsPage : AppCompatActivity() {
     }
 
     private fun showNameAndSectionDialog() {
+        // This function remains unchanged
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_name, null)
-        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val builder = AlertDialog.Builder(this)
+        builder.setView(dialogView)
+
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
