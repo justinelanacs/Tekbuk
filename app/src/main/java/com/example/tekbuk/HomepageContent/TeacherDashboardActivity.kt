@@ -2,34 +2,37 @@ package com.example.tekbuk.HomepageContent
 
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.ProgressBar
+import android.widget.Spinner
+import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.setPadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tekbuk.R
 import com.google.firebase.firestore.FirebaseFirestore
-
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.ScrollView
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import com.google.firebase.firestore.Query
 
 class TeacherDashboardActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
+    private lateinit var sectionSpinner: Spinner // The "Select Element"
     private lateinit var db: FirebaseFirestore
-    private val studentList = ArrayList<StudentResult>()
+
+    // Create two lists: one for all data, one for filtered data
+    private val allStudentsList = ArrayList<StudentResult>()
+    private val filteredStudentList = ArrayList<StudentResult>()
     private lateinit var adapter: StudentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_teacher_dashboard)
 
@@ -41,29 +44,30 @@ class TeacherDashboardActivity : AppCompatActivity() {
         }
 
         // Initialize Views
-        recyclerView = findViewById(R.id.rvStudentScores) // Ensure ID matches your XML
-        progressBar = findViewById(R.id.progressBar) // Ensure ID matches your XML
+        recyclerView = findViewById(R.id.rvStudentScores)
+        progressBar = findViewById(R.id.progressBar)
+        sectionSpinner = findViewById(R.id.sectionSpinner) // Find the new select element
 
         // Initialize Firestore
         db = FirebaseFirestore.getInstance()
 
-        // Setup RecyclerView
+        // Setup RecyclerView with the list that will be filtered
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = StudentAdapter(studentList) { selectedStudent ->
+        adapter = StudentAdapter(filteredStudentList) { selectedStudent ->
             showStudentDetailsDialog(selectedStudent)
         }
         recyclerView.adapter = adapter
 
-        // Fetch Data
+        // Fetch Data from Firebase
         fetchDataFromFirebase()
     }
 
     private fun fetchDataFromFirebase() {
         progressBar.visibility = View.VISIBLE
-        studentList.clear()
+        allStudentsList.clear()
 
         db.collection("quiz_results")
-            .orderBy("last_updated", Query.Direction.DESCENDING)
+            .orderBy("studentName", Query.Direction.ASCENDING)
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -81,12 +85,14 @@ class TeacherDashboardActivity : AppCompatActivity() {
                         pagtataya_score = pagtataya,
                         rawData = rawData
                     )
-                    studentList.add(student)
+                    allStudentsList.add(student)
                 }
-                adapter.notifyDataSetChanged()
+
+                // After fetching all data, setup the section filter
+                setupSectionFilter()
                 progressBar.visibility = View.GONE
 
-                if (studentList.isEmpty()) {
+                if (allStudentsList.isEmpty()) {
                     Toast.makeText(this, "No student records found yet.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -96,13 +102,66 @@ class TeacherDashboardActivity : AppCompatActivity() {
             }
     }
 
+    // ... inside your TeacherDashboardActivity
+
+    private fun setupSectionFilter() {
+        // Get a unique, sorted list of sections from all students
+        val sections = allStudentsList.map { it.section }.distinct().sorted()
+
+        // Create a list for the spinner, adding an "All" option at the start
+        val spinnerItems = mutableListOf("All Sections").apply { addAll(sections) }
+
+        // ⭐ FIX: Use the new custom layout for the spinner adapter ⭐
+        val spinnerAdapter = ArrayAdapter(
+            this,
+            R.layout.spinner_item_black, // Use our custom layout
+            spinnerItems
+        )
+
+        // You can also set a custom layout for the dropdown view itself if needed
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        sectionSpinner.adapter = spinnerAdapter
+
+        // Set a listener to react when the teacher selects an item
+        sectionSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedSection = spinnerItems[position]
+                filterStudentList(selectedSection)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Do nothing
+            }
+        }
+
+        // Initially, show all students
+        filterStudentList("All Sections")
+    }
+
+    private fun filterStudentList(section: String) {
+        filteredStudentList.clear() // Clear the currently displayed list
+
+        if (section == "All Sections") {
+            // If "All" is selected, add all students
+            filteredStudentList.addAll(allStudentsList)
+        } else {
+            // Otherwise, add only the students that match the selected section
+            val studentsFromSection = allStudentsList.filter { it.section == section }
+            filteredStudentList.addAll(studentsFromSection)
+        }
+
+        // Notify the adapter that the data has changed, so the UI updates
+        adapter.notifyDataSetChanged()
+    }
+
+    // --- Your existing showStudentDetailsDialog() function does not need to change ---
     private fun showStudentDetailsDialog(student: StudentResult) {
         val builder = AlertDialog.Builder(this)
         // We will set a custom title view inside the layout, so we don't set title here to keep it cleaner
 
         // 1. Root ScrollView (To ensure it fits on screen)
         val scrollView = ScrollView(this)
-        scrollView.setBackgroundColor(resources.getColor(R.color.fourpointfive)) // App Background Color
+        scrollView.setBackgroundColor(resources.getColor(R.color.fourpointfive, theme)) // App Background Color
 
         // 2. Main Container (LinearLayout)
         val mainContainer = android.widget.LinearLayout(this)
@@ -114,14 +173,14 @@ class TeacherDashboardActivity : AppCompatActivity() {
         tvName.text = student.studentName.uppercase()
         tvName.textSize = 20f
         tvName.setTypeface(null, android.graphics.Typeface.BOLD)
-        tvName.setTextColor(resources.getColor(R.color.black))
+        tvName.setTextColor(resources.getColor(R.color.black, theme))
         tvName.gravity = android.view.Gravity.CENTER
         mainContainer.addView(tvName)
 
         val tvSection = TextView(this)
         tvSection.text = student.section
         tvSection.textSize = 16f
-        tvSection.setTextColor(resources.getColor(R.color.one)) // Accent Color
+        tvSection.setTextColor(resources.getColor(R.color.one, theme)) // Accent Color
         tvSection.gravity = android.view.Gravity.CENTER
         tvSection.setPadding(0, 0, 0, 30) // Bottom margin
         mainContainer.addView(tvSection)
@@ -130,7 +189,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
         val summaryCard = androidx.cardview.widget.CardView(this)
         summaryCard.radius = 30f
         summaryCard.cardElevation = 10f
-        summaryCard.setCardBackgroundColor(resources.getColor(R.color.white))
+        summaryCard.setCardBackgroundColor(resources.getColor(R.color.white, theme))
 
         val summaryParams = android.widget.LinearLayout.LayoutParams(
             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
@@ -153,7 +212,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
         tvTotalScore.text = "${student.total_score}"
         tvTotalScore.textSize = 32f
         tvTotalScore.setTypeface(null, android.graphics.Typeface.BOLD)
-        tvTotalScore.setTextColor(resources.getColor(R.color.one))
+        tvTotalScore.setTextColor(resources.getColor(R.color.one, theme))
         tvTotalScore.gravity = android.view.Gravity.CENTER
         summaryLayout.addView(tvTotalScore)
 
@@ -185,7 +244,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
                 tvTopicTitle.text = "${topic.uppercase()} (Quiz: $topicTotal pts)"
                 tvTopicTitle.textSize = 16f
                 tvTopicTitle.setTypeface(null, android.graphics.Typeface.BOLD)
-                tvTopicTitle.setTextColor(resources.getColor(R.color.black))
+                tvTopicTitle.setTextColor(resources.getColor(R.color.black, theme))
                 tvTopicTitle.setPadding(0, 20, 0, 10)
                 mainContainer.addView(tvTopicTitle)
 
@@ -193,7 +252,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
                 val tvScores = TextView(this)
                 tvScores.text = "Level 1: $l1  |  Level 2: $l2"
                 tvScores.textSize = 14f
-                tvScores.setTextColor(resources.getColor(R.color.one))
+                tvScores.setTextColor(resources.getColor(R.color.one, theme))
                 tvScores.setPadding(0, 0, 0, 10)
                 mainContainer.addView(tvScores)
 
@@ -201,7 +260,6 @@ class TeacherDashboardActivity : AppCompatActivity() {
                 val essayContainer = android.widget.LinearLayout(this)
                 essayContainer.orientation = android.widget.LinearLayout.VERTICAL
                 essayContainer.setBackgroundResource(R.drawable.edittext_bg) // Reusing your existing drawable if available, or use color
-                // If edittext_bg doesn't exist, use: essayContainer.setBackgroundColor(android.graphics.Color.WHITE)
                 essayContainer.setPadding(25, 25, 25, 25)
 
                 // Add margins to the essay box
@@ -221,15 +279,12 @@ class TeacherDashboardActivity : AppCompatActivity() {
                 // --- FIX FOR WRAPPING TEXT (Inside Loop) ---
                 val tvEssayBody = TextView(this)
                 tvEssayBody.text = l3Answer
-                tvEssayBody.setTextColor(resources.getColor(R.color.black))
+                tvEssayBody.setTextColor(resources.getColor(R.color.black, theme))
                 tvEssayBody.textSize = 14f
                 tvEssayBody.setPadding(0, 10, 0, 0)
 
-                // 1. Allow multiple lines
                 tvEssayBody.isSingleLine = false
-                // 2. Set InputType to Text + MultiLine
                 tvEssayBody.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
-                // 3. Set layout params to WRAP_CONTENT
                 tvEssayBody.layoutParams = android.widget.LinearLayout.LayoutParams(
                     android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
                     android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -247,13 +302,13 @@ class TeacherDashboardActivity : AppCompatActivity() {
         tvMainRepTitle.text = "MAIN REPLEKSYON"
         tvMainRepTitle.textSize = 18f
         tvMainRepTitle.setTypeface(null, android.graphics.Typeface.BOLD)
-        tvMainRepTitle.setTextColor(resources.getColor(R.color.one))
+        tvMainRepTitle.setTextColor(resources.getColor(R.color.one, theme))
         tvMainRepTitle.setPadding(0, 20, 0, 10)
         mainContainer.addView(tvMainRepTitle)
 
         val repContainer = android.widget.LinearLayout(this)
         repContainer.orientation = android.widget.LinearLayout.VERTICAL
-        repContainer.setBackgroundColor(resources.getColor(R.color.white)) // Or R.drawable.edittext_bg
+        repContainer.setBackgroundColor(resources.getColor(R.color.white, theme)) // Or R.drawable.edittext_bg
         repContainer.setPadding(30, 30, 30, 30)
 
         val repParams = android.widget.LinearLayout.LayoutParams(
@@ -263,16 +318,12 @@ class TeacherDashboardActivity : AppCompatActivity() {
         repParams.setMargins(0, 0, 0, 20)
         repContainer.layoutParams = repParams
 
-        // --- FIX FOR WRAPPING TEXT ---
         val tvRepBody = TextView(this)
         tvRepBody.text = mainRep
         tvRepBody.textSize = 15f
-        tvRepBody.setTextColor(resources.getColor(R.color.black))
-        // 1. Force SingleLine to FALSE
+        tvRepBody.setTextColor(resources.getColor(R.color.black, theme))
         tvRepBody.isSingleLine = false
-        // 2. Set InputType to MultiLine
         tvRepBody.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
-        // 3. Ensure layout params assume wrapping
         tvRepBody.layoutParams = android.widget.LinearLayout.LayoutParams(
             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -291,18 +342,17 @@ class TeacherDashboardActivity : AppCompatActivity() {
         // Optional: Customize Button Color
         val dialog = builder.create()
         dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.one))
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.one, theme))
         }
         dialog.show()
     }
-
 }
+
 data class StudentResult(
     val id: String = "",
     val studentName: String = "",
     val section: String = "",
     val total_score: Int = 0,
     val pagtataya_score: Int = 0,
-    // We store all raw data map to access specific topic scores/reflections easily later
     val rawData: Map<String, Any> = emptyMap()
 )

@@ -24,4 +24,11 @@
             <h1>ANG ALAMAT NG MANGUMIT</h1>
     </string>
 
+        <!-- ... other strings ... -->
+    <string name="select_section_prompt">Select Section</string>
+
+
+
 </resources>
+
+
