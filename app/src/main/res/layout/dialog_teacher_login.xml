@@ -29,19 +29,29 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="20dp" />
 
-            <!-- Password Input -->
-            <EditText
-                android:id="@+id/etDialogPassword"
+            <!-- ⭐ MODIFIED: Replaced EditText with TextInputLayout ⭐ -->
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:textColorHint="@color/one"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:gravity="center"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:textSize="14sp"
-                android:layout_marginBottom="20dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxStrokeColor="@color/one"
+                app:hintTextColor="@color/one"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/one">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDialogPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+            <!-- End of modification -->
+
 
             <!-- Login/Continue Button -->
             <Button
