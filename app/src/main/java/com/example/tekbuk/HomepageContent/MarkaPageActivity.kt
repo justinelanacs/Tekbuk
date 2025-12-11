@@ -228,8 +228,6 @@ class MarkaPageActivity : AppCompatActivity() {
             scoresMap["repleksyon_status"] = "Pending"
         }
 
-        // --- DELETE THE DUPLICATE BLOCK THAT WAS HERE ---
-
         // Add the total score to the map
         scoresMap["total_score"] = totalScore
 

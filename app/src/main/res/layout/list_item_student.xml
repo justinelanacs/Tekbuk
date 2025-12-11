@@ -12,27 +12,41 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvStudentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Student Name"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:id="@+id/tvSection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Section"
+                android:textSize="14sp"
+                android:textColor="@color/four"/>
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvListItemStudentName"
+            android:id="@+id/tvTotalScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="18sp"
+            android:text="0 pts"
             android:textStyle="bold"
-            tools:text="JUAN DELA CRUZ" />
-
-        <TextView
-            android:id="@+id/tvListItemStudentSection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            tools:text="BSCS 4-1" />
+            android:textSize="18sp"
+            android:textColor="@color/one"/>
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>
