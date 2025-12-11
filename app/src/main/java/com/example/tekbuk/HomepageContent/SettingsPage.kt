@@ -1,5 +1,6 @@
 package com.example.tekbuk.HomepageContent
 
+import android.app.Activity // ⭐ ADD THIS IMPORT
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,10 +9,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts // ⭐ ADD THIS IMPORT
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.tekbuk.R
 import com.example.tekbuk.databinding.ActivitySettingsPageBinding
 import com.google.firebase.auth.EmailAuthProvider
@@ -21,25 +21,30 @@ class SettingsPage : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsPageBinding
     private lateinit var auth: FirebaseAuth
-    // Key for storing the teacher password
-    private val teacherPrefsName = "TeacherProfile"
-    private val keyTeacherPassword = "TeacherPassword"
+
+    private val PREFS_SESSION = "TeacherSession"
+    private val KEY_LAST_LOGIN = "LastLoginTime"
+    private val SESSION_TIMEOUT_MS = 15 * 60 * 1000L
+
+    // ⭐ STEP 1: Create the launcher
+    private val dashboardLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        // This block will execute when TeacherDashboardActivity closes.
+        if (result.resultCode == Activity.RESULT_OK) {
+            // This means we came back after a successful logout.
+            // We can show a toast or simply do nothing, as the user is now logged out.
+            Toast.makeText(this, "Ready to log in again.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        // Removed enableEdgeToEdge and manual insets for simplicity with this logic
         binding = ActivitySettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
-
         loadUserProfile()
 
         binding.btnlogin.setOnClickListener {
@@ -51,28 +56,23 @@ class SettingsPage : AppCompatActivity() {
         }
     }
 
-    private fun loadUserProfile() {
-        val prefs = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
-        val name = prefs.getString("StudentName", "STUDENT NAME")
-        val section = prefs.getString("StudentSection", "SECTION")
-        binding.stdname.text = name
-        binding.stdsection.text = section
+    // ⭐ STEP 2: Create a helper function to start the dashboard
+    private fun goToDashboard() {
+        val intent = Intent(this, TeacherDashboardActivity::class.java)
+        dashboardLauncher.launch(intent)
     }
 
     private fun showLoginDialog() {
-        // Check if a teacher is ALREADY logged in
         val currentUser = auth.currentUser
         if (currentUser != null) {
             if (isSessionValid()) {
-                // SESSION IS GOOD: Update time and go to dashboard
                 updateSessionTimestamp()
-                startActivity(Intent(this, TeacherDashboardActivity::class.java))
+                goToDashboard() // Use the new launcher method
                 return
             } else {
-                // SESSION EXPIRED: Force Logout
                 auth.signOut()
+                clearSessionTimestamp()
                 Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_LONG).show()
-                // The code will continue below to show the login dialog...
             }
         }
 
@@ -82,13 +82,10 @@ class SettingsPage : AppCompatActivity() {
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        // Views from dialog_teacher_login.xml
-        // IMPORTANT: You need an EMAIL field in your login dialog for Firebase!
-        // Assuming you updated dialog_teacher_login.xml to have an EditText for email
         val etEmail = dialogView.findViewById<EditText>(R.id.etDialogEmail)
         val etPassword = dialogView.findViewById<EditText>(R.id.etDialogPassword)
-        val btnLogin = dialogView.findViewById<Button>(R.id.btnDialogLogin) // or btnDialogSubmit
-        val tvChangePassword = dialogView.findViewById<TextView>(R.id.tvChangePassword) // or tvRegister
+        val btnLogin = dialogView.findViewById<Button>(R.id.btnDialogLogin)
+        val tvChangePassword = dialogView.findViewById<TextView>(R.id.tvChangePassword)
 
         btnLogin.setOnClickListener {
             val email = etEmail.text.toString().trim()
@@ -98,14 +95,12 @@ class SettingsPage : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            // ⭐ IMPORTANT: Save the timestamp on success!
                             updateSessionTimestamp()
-
                             Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this, TeacherDashboardActivity::class.java))
                             dialog.dismiss()
+                            goToDashboard() // Use the new launcher method
                         } else {
-                            Toast.makeText(this, "Login Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Login Failed: Incorrect email or password.", Toast.LENGTH_LONG).show()
                         }
                     }
             } else {
@@ -113,7 +108,6 @@ class SettingsPage : AppCompatActivity() {
             }
         }
 
-        // Change Password Button Logic
         tvChangePassword.setOnClickListener {
             dialog.dismiss()
             showChangePasswordDialog()
@@ -121,30 +115,40 @@ class SettingsPage : AppCompatActivity() {
 
         dialog.show()
     }
-    // 1. Define the Timeout Duration (e.g., 15 minutes in milliseconds)
-    // 1000 ms * 60 sec * 15 min = 900,000 ms
-    private val SESSION_TIMEOUT_MS = 15 * 60 * 1000L
 
-    // Key for SharedPreferences
-    private val PREFS_SESSION = "TeacherSession"
-    private val KEY_LAST_LOGIN = "LastLoginTime"
-
-    // ... existing onCreate ...
-
+    // ... The rest of your code (updateSessionTimestamp, clearSessionTimestamp, etc.) remains exactly the same ...
     // HELPER: Save the current time when the teacher logs in
     private fun updateSessionTimestamp() {
         val prefs = getSharedPreferences(PREFS_SESSION, Context.MODE_PRIVATE)
         prefs.edit().putLong(KEY_LAST_LOGIN, System.currentTimeMillis()).apply()
     }
 
+    // HELPER: Clear the session timestamp on logout/expiration
+    private fun clearSessionTimestamp() {
+        val prefs = getSharedPreferences(PREFS_SESSION, Context.MODE_PRIVATE)
+        prefs.edit().remove(KEY_LAST_LOGIN).apply()
+    }
+
     // HELPER: Check if the session has expired
     private fun isSessionValid(): Boolean {
         val prefs = getSharedPreferences(PREFS_SESSION, Context.MODE_PRIVATE)
         val lastLoginTime = prefs.getLong(KEY_LAST_LOGIN, 0)
+
+        // If lastLoginTime is 0, it means user was logged out, so session is invalid
+        if (lastLoginTime == 0L) return false
+
         val currentTime = System.currentTimeMillis()
 
         // If (Current Time - Last Login) is bigger than Timeout, it's expired
         return (currentTime - lastLoginTime) < SESSION_TIMEOUT_MS
+    }
+
+    private fun loadUserProfile() {
+        val prefs = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
+        val name = prefs.getString("StudentName", "STUDENT NAME")
+        val section = prefs.getString("StudentSection", "SECTION")
+        binding.stdname.text = name
+        binding.stdsection.text = section
     }
 
     private fun showChangePasswordDialog() {
@@ -166,36 +170,30 @@ class SettingsPage : AppCompatActivity() {
 
             val user = auth.currentUser
 
-            // 1. Check if user is logged in
             if (user == null || user.email == null) {
-                Toast.makeText(this, "No teacher is currently logged in.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "You must be logged in to change your password. Please log in first.", Toast.LENGTH_LONG).show()
+                dialog.dismiss()
+                showLoginDialog()
                 return@setOnClickListener
             }
-
-            // 2. Basic Validation
             if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
             if (newPassword != confirmPassword) {
                 Toast.makeText(this, "New passwords do not match!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
             if (newPassword.length < 6) {
                 Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 3. RE-AUTHENTICATE (Security Requirement from Firebase)
-            // We must verify the old password is correct before changing to a new one
             val credential = EmailAuthProvider.getCredential(user.email!!, oldPassword)
 
             user.reauthenticate(credential)
                 .addOnCompleteListener { authTask ->
                     if (authTask.isSuccessful) {
-                        // 4. Update Password
                         user.updatePassword(newPassword)
                             .addOnCompleteListener { updateTask ->
                                 if (updateTask.isSuccessful) {
@@ -206,7 +204,7 @@ class SettingsPage : AppCompatActivity() {
                                 }
                             }
                     } else {
-                        Toast.makeText(this, "Incorrect Current Password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Authentication failed: Incorrect Current Password", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
@@ -215,7 +213,6 @@ class SettingsPage : AppCompatActivity() {
     }
 
     private fun showNameAndSectionDialog() {
-        // This function remains unchanged
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_name, null)
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
