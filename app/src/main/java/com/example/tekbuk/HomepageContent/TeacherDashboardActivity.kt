@@ -109,13 +109,19 @@ class TeacherDashboardActivity : AppCompatActivity() {
         val topics = listOf("tula", "sanaysay", "dagli", "talumpati", "kwentong_bayan")
 
         for (topic in topics) {
-            val l1 = student.rawData["${topic}_l1"] ?: 0
-            val l2 = student.rawData["${topic}_l2"] ?: 0
+            // 1. Get scores safely (Cast to Number first to handle Long/Int from Firestore)
+            val l1 = (student.rawData["${topic}_l1"] as? Number)?.toInt() ?: 0
+            val l2 = (student.rawData["${topic}_l2"] as? Number)?.toInt() ?: 0
             val l3Answer = student.rawData["${topic}_l3_answer"] as? String ?: "No Answer"
 
-            sb.append("${topic.uppercase()}:\n")
-            sb.append("  L1: $l1 | L2: $l2\n")
-            sb.append("  Repleksyon: $l3Answer\n\n")
+            // 2. Calculate the Total for this specific Paksa
+            val topicTotal = l1 + l2
+
+            // 3. Display with the calculated total
+            sb.append("${topic.uppercase()} (Total: $topicTotal pts):\n")
+            sb.append("  Level 1: $l1\n")
+            sb.append("  Level 2: $l2\n")
+            sb.append("  Repleksyon: \"$l3Answer\"\n\n")
         }
 
         sb.append("--- MAIN REPLEKSYON ---\n")
