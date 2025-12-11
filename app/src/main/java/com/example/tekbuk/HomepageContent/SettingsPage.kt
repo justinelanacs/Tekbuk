@@ -1,6 +1,7 @@
 package com.example.tekbuk.HomepageContent
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -17,26 +18,25 @@ import com.example.tekbuk.databinding.ActivitySettingsPageBinding
 class SettingsPage : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsPageBinding
+    // Key for storing the teacher password
+    private val teacherPrefsName = "TeacherProfile"
+    private val keyTeacherPassword = "TeacherPassword"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // Must be called before setting content view with binding
+        enableEdgeToEdge()
 
         binding = ActivitySettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Handle system bars insets
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // ⭐ 2. LOAD USER PROFILE ON START
-        // This ensures that the saved name and section are displayed when the page opens.
         loadUserProfile()
 
-        // Set OnClick Listeners
         binding.btnlogin.setOnClickListener {
             showLoginDialog()
         }
@@ -58,34 +58,72 @@ class SettingsPage : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_teacher_login, null)
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
-
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        val etEmail = dialogView.findViewById<EditText>(R.id.etDialogEmail)
+        // Get views from the new layout
         val etPassword = dialogView.findViewById<EditText>(R.id.etDialogPassword)
-        val btnSubmit = dialogView.findViewById<Button>(R.id.btnDialogSubmit)
-        val tvForgot = dialogView.findViewById<TextView>(R.id.tvForgotPassword)
-        val tvRegister = dialogView.findViewById<TextView>(R.id.tvRegister)
+        val btnLogin = dialogView.findViewById<Button>(R.id.btnDialogLogin)
+        val tvChangePassword = dialogView.findViewById<TextView>(R.id.tvChangePassword)
 
-        btnSubmit.setOnClickListener {
-            val email = etEmail.text.toString()
-            val password = etPassword.text.toString()
+        // Get the saved password, with "administrator2025" as the default
+        val prefs = getSharedPreferences(teacherPrefsName, Context.MODE_PRIVATE)
+        val savedPassword = prefs.getString(keyTeacherPassword, "administrator2025")
 
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                Toast.makeText(this, "Logging in...", Toast.LENGTH_SHORT).show()
+        // "PASOK" button logic
+        btnLogin.setOnClickListener {
+            val enteredPassword = etPassword.text.toString()
+            if (enteredPassword == savedPassword) {
+                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                // Open the new empty activity
+                startActivity(Intent(this, TeacherDashboardActivity::class.java))
                 dialog.dismiss()
             } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Incorrect Password", Toast.LENGTH_SHORT).show()
             }
         }
 
-        tvForgot.setOnClickListener {
-            Toast.makeText(this, "Forgot Password clicked", Toast.LENGTH_SHORT).show()
+        // "Change Password" text logic
+        tvChangePassword.setOnClickListener {
+            dialog.dismiss() // Close the current dialog
+            showChangePasswordDialog() // Open the new one
         }
 
-        tvRegister.setOnClickListener {
-            Toast.makeText(this, "Register clicked", Toast.LENGTH_SHORT).show()
+        dialog.show()
+    }
+
+    private fun showChangePasswordDialog() {
+        // Here we'll use a dialog with two password fields and a save button.
+        // I will design it programmatically for simplicity, but you can create a new XML.
+        val newDialogView = layoutInflater.inflate(R.layout.dialog_change_password, null)
+        val builder = AlertDialog.Builder(this)
+        builder.setView(newDialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val etNewPassword = newDialogView.findViewById<EditText>(R.id.etDialogNewPassword)
+        val etConfirmPassword = newDialogView.findViewById<EditText>(R.id.etDialogConfirmPassword)
+        val btnSave = newDialogView.findViewById<Button>(R.id.btnDialogSavePassword)
+
+        btnSave.setOnClickListener {
+            val newPassword = etNewPassword.text.toString()
+            val confirmPassword = etConfirmPassword.text.toString()
+
+            if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (newPassword != confirmPassword) {
+                Toast.makeText(this, "Passwords do not match!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Save the new password to SharedPreferences
+            val prefs = getSharedPreferences(teacherPrefsName, Context.MODE_PRIVATE)
+            prefs.edit().putString(keyTeacherPassword, newPassword).apply()
+
+            Toast.makeText(this, "Password changed successfully!", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
@@ -93,6 +131,7 @@ class SettingsPage : AppCompatActivity() {
     }
 
     private fun showNameAndSectionDialog() {
+        // This function remains unchanged
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_name, null)
         val builder = AlertDialog.Builder(this)
         builder.setView(dialogView)
@@ -103,10 +142,8 @@ class SettingsPage : AppCompatActivity() {
         val nameInput = dialogView.findViewById<EditText>(R.id.etName)
         val sectionInput = dialogView.findViewById<EditText>(R.id.etSection)
         val btnSave = dialogView.findViewById<Button>(R.id.btnDialogSave)
-        // ⭐ 1. FIX: The Cancel button is a TextView in the new layout.
         val btnCancel = dialogView.findViewById<TextView>(R.id.btnDialogCancel)
 
-        // Pre-fill EditTexts if there's already a name and section
         if (binding.stdname.text.isNotEmpty() && binding.stdname.text != "STUDENT NAME") {
             nameInput.setText(binding.stdname.text)
         }
@@ -118,13 +155,8 @@ class SettingsPage : AppCompatActivity() {
             val name = nameInput.text.toString().trim().uppercase()
             val section = sectionInput.text.toString().trim().uppercase()
 
-            if (name.isEmpty()) {
-                Toast.makeText(this, "Maglagay ng pangalan bago i-save!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (section.isEmpty()) {
-                Toast.makeText(this, "Maglagay ng seksyon bago i-save!", Toast.LENGTH_SHORT).show()
+            if (name.isEmpty() || section.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

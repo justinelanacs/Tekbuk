@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tekbuk">
         <activity
-            android:name=".teacher_dashboard"
+            android:name=".HomepageContent.TeacherDashboardActivity"
             android:exported="false" />
         <activity
             android:name=".GawainContent.KWENTONGBAYAN_level3"
