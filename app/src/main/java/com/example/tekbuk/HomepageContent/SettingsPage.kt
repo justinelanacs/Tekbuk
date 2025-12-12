@@ -1,15 +1,16 @@
 package com.example.tekbuk.HomepageContent
 
-import android.app.Activity // ⭐ ADD THIS IMPORT
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts // ⭐ ADD THIS IMPORT
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tekbuk.R
@@ -22,41 +23,137 @@ class SettingsPage : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsPageBinding
     private lateinit var auth: FirebaseAuth
 
+    // Constants for SharedPreferences keys for better maintenance
     private val PREFS_SESSION = "TeacherSession"
     private val KEY_LAST_LOGIN = "LastLoginTime"
     private val SESSION_TIMEOUT_MS = 15 * 60 * 1000L
 
-    // ⭐ STEP 1: Create the launcher
+    private val PREFS_USER_PROFILE = "UserProfile"
+    private val KEY_STUDENT_NAME = "StudentName"
+    private val KEY_STUDENT_SECTION = "StudentSection"
+    private val KEY_NAME_IS_SET = "NameIsSet" // Flag to check if the name is permanently set
+
     private val dashboardLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        // This block will execute when TeacherDashboardActivity closes.
         if (result.resultCode == Activity.RESULT_OK) {
-            // This means we came back after a successful logout.
-            // We can show a toast or simply do nothing, as the user is now logged out.
             Toast.makeText(this, "Ready to log in again.", Toast.LENGTH_SHORT).show()
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // Removed enableEdgeToEdge and manual insets for simplicity with this logic
         binding = ActivitySettingsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-        loadUserProfile()
+        loadUserProfile() // This function now contains the logic to show/hide the button
 
         binding.btnlogin.setOnClickListener {
             showLoginDialog()
         }
 
         binding.btnAddName.setOnClickListener {
-            showNameAndSectionDialog()
+            // The button click now starts the two-step process by showing the notice first
+            showNameNoticeDialog()
         }
     }
 
-    // ⭐ STEP 2: Create a helper function to start the dashboard
+    private fun loadUserProfile() {
+        val prefs = getSharedPreferences(PREFS_USER_PROFILE, Context.MODE_PRIVATE)
+        val isNameSet = prefs.getBoolean(KEY_NAME_IS_SET, false)
+
+        if (isNameSet) {
+            // If the name is permanently set, load it and hide the button
+            val name = prefs.getString(KEY_STUDENT_NAME, "")
+            val section = prefs.getString(KEY_STUDENT_SECTION, "")
+            binding.stdname.text = name
+            binding.stdsection.text = section
+
+            binding.btnAddName.visibility = View.GONE // Hide the button permanently
+            binding.stdname.visibility = View.VISIBLE
+            binding.stdsection.visibility = View.VISIBLE
+
+        } else {
+            // If the name is not set, show the button and hide the text views
+            binding.btnAddName.visibility = View.VISIBLE
+            binding.stdname.visibility = View.GONE
+            binding.stdsection.visibility = View.GONE
+        }
+    }
+
+    /**
+     * Step 1 of the workflow: Show a warning dialog.
+     */
+    private fun showNameNoticeDialog() {
+        // You must have 'dialog_name_notice.xml' in your layout folder for this to work.
+        val dialogView = layoutInflater.inflate(R.layout.dialog_name_notice, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val btnCancel = dialogView.findViewById<Button>(R.id.btnNoticeCancel)
+        val btnContinue = dialogView.findViewById<Button>(R.id.btnNoticeContinue)
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnContinue.setOnClickListener {
+            dialog.dismiss()
+            showNameAndSectionInputDialog() // On continue, proceed to the input dialog
+        }
+
+        dialog.show()
+    }
+
+    /**
+     * Step 2 of the workflow: Show the actual input dialog.
+     */
+    private fun showNameAndSectionInputDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_name, null)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val nameInput = dialogView.findViewById<EditText>(R.id.etName)
+        val sectionInput = dialogView.findViewById<EditText>(R.id.etSection)
+        val btnSave = dialogView.findViewById<Button>(R.id.btnDialogSave)
+        val btnCancel = dialogView.findViewById<TextView>(R.id.btnDialogCancel)
+
+        btnSave.setOnClickListener {
+            val name = nameInput.text.toString().trim().uppercase()
+            val section = sectionInput.text.toString().trim().uppercase()
+
+            if (name.isEmpty() || section.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Save the data and set the permanent flag
+            val prefs = getSharedPreferences(PREFS_USER_PROFILE, Context.MODE_PRIVATE)
+            with(prefs.edit()) {
+                putString(KEY_STUDENT_NAME, name)
+                putString(KEY_STUDENT_SECTION, section)
+                putBoolean(KEY_NAME_IS_SET, true) // This flag ensures the button will be hidden next time
+                apply()
+            }
+
+            Toast.makeText(this, "Datos ay nai-save!", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+
+            // Reload the UI immediately to hide the button and show the name/section
+            loadUserProfile()
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    // --- All other functions (Login, Password Change, etc.) remain unchanged ---
+
     private fun goToDashboard() {
         val intent = Intent(this, TeacherDashboardActivity::class.java)
         dashboardLauncher.launch(intent)
@@ -67,7 +164,7 @@ class SettingsPage : AppCompatActivity() {
         if (currentUser != null) {
             if (isSessionValid()) {
                 updateSessionTimestamp()
-                goToDashboard() // Use the new launcher method
+                goToDashboard()
                 return
             } else {
                 auth.signOut()
@@ -77,8 +174,7 @@ class SettingsPage : AppCompatActivity() {
         }
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_teacher_login, null)
-        val builder = AlertDialog.Builder(this)
-        builder.setView(dialogView)
+        val builder = AlertDialog.Builder(this).setView(dialogView)
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
@@ -98,7 +194,7 @@ class SettingsPage : AppCompatActivity() {
                             updateSessionTimestamp()
                             Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
                             dialog.dismiss()
-                            goToDashboard() // Use the new launcher method
+                            goToDashboard()
                         } else {
                             Toast.makeText(this, "Login Failed: Incorrect email or password.", Toast.LENGTH_LONG).show()
                         }
@@ -116,45 +212,27 @@ class SettingsPage : AppCompatActivity() {
         dialog.show()
     }
 
-    // ... The rest of your code (updateSessionTimestamp, clearSessionTimestamp, etc.) remains exactly the same ...
-    // HELPER: Save the current time when the teacher logs in
     private fun updateSessionTimestamp() {
         val prefs = getSharedPreferences(PREFS_SESSION, Context.MODE_PRIVATE)
         prefs.edit().putLong(KEY_LAST_LOGIN, System.currentTimeMillis()).apply()
     }
 
-    // HELPER: Clear the session timestamp on logout/expiration
     private fun clearSessionTimestamp() {
         val prefs = getSharedPreferences(PREFS_SESSION, Context.MODE_PRIVATE)
         prefs.edit().remove(KEY_LAST_LOGIN).apply()
     }
 
-    // HELPER: Check if the session has expired
     private fun isSessionValid(): Boolean {
         val prefs = getSharedPreferences(PREFS_SESSION, Context.MODE_PRIVATE)
         val lastLoginTime = prefs.getLong(KEY_LAST_LOGIN, 0)
-
-        // If lastLoginTime is 0, it means user was logged out, so session is invalid
         if (lastLoginTime == 0L) return false
-
         val currentTime = System.currentTimeMillis()
-
-        // If (Current Time - Last Login) is bigger than Timeout, it's expired
         return (currentTime - lastLoginTime) < SESSION_TIMEOUT_MS
-    }
-
-    private fun loadUserProfile() {
-        val prefs = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
-        val name = prefs.getString("StudentName", "STUDENT NAME")
-        val section = prefs.getString("StudentSection", "SECTION")
-        binding.stdname.text = name
-        binding.stdsection.text = section
     }
 
     private fun showChangePasswordDialog() {
         val newDialogView = layoutInflater.inflate(R.layout.dialog_change_password, null)
-        val builder = AlertDialog.Builder(this)
-        builder.setView(newDialogView)
+        val builder = AlertDialog.Builder(this).setView(newDialogView)
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
@@ -167,7 +245,6 @@ class SettingsPage : AppCompatActivity() {
             val oldPassword = etOldPassword.text.toString().trim()
             val newPassword = etNewPassword.text.toString().trim()
             val confirmPassword = etConfirmPassword.text.toString().trim()
-
             val user = auth.currentUser
 
             if (user == null || user.email == null) {
@@ -190,75 +267,21 @@ class SettingsPage : AppCompatActivity() {
             }
 
             val credential = EmailAuthProvider.getCredential(user.email!!, oldPassword)
-
-            user.reauthenticate(credential)
-                .addOnCompleteListener { authTask ->
-                    if (authTask.isSuccessful) {
-                        user.updatePassword(newPassword)
-                            .addOnCompleteListener { updateTask ->
-                                if (updateTask.isSuccessful) {
-                                    Toast.makeText(this, "Password updated successfully!", Toast.LENGTH_SHORT).show()
-                                    dialog.dismiss()
-                                } else {
-                                    Toast.makeText(this, "Error updating password: ${updateTask.exception?.message}", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                    } else {
-                        Toast.makeText(this, "Authentication failed: Incorrect Current Password", Toast.LENGTH_SHORT).show()
+            user.reauthenticate(credential).addOnCompleteListener { authTask ->
+                if (authTask.isSuccessful) {
+                    user.updatePassword(newPassword).addOnCompleteListener { updateTask ->
+                        if (updateTask.isSuccessful) {
+                            Toast.makeText(this, "Password updated successfully!", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                        } else {
+                            Toast.makeText(this, "Error updating password: ${updateTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
                     }
+                } else {
+                    Toast.makeText(this, "Authentication failed: Incorrect Current Password", Toast.LENGTH_SHORT).show()
                 }
-        }
-
-        dialog.show()
-    }
-
-    private fun showNameAndSectionDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_name, null)
-        val builder = AlertDialog.Builder(this)
-        builder.setView(dialogView)
-
-        val dialog = builder.create()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        val nameInput = dialogView.findViewById<EditText>(R.id.etName)
-        val sectionInput = dialogView.findViewById<EditText>(R.id.etSection)
-        val btnSave = dialogView.findViewById<Button>(R.id.btnDialogSave)
-        val btnCancel = dialogView.findViewById<TextView>(R.id.btnDialogCancel)
-
-        if (binding.stdname.text.isNotEmpty() && binding.stdname.text != "STUDENT NAME") {
-            nameInput.setText(binding.stdname.text)
-        }
-        if (binding.stdsection.text.isNotEmpty() && binding.stdsection.text != "SECTION") {
-            sectionInput.setText(binding.stdsection.text)
-        }
-
-        btnSave.setOnClickListener {
-            val name = nameInput.text.toString().trim().uppercase()
-            val section = sectionInput.text.toString().trim().uppercase()
-
-            if (name.isEmpty() || section.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
             }
-
-            binding.stdname.text = name
-            binding.stdsection.text = section
-
-            val prefs = getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
-            with(prefs.edit()) {
-                putString("StudentName", name)
-                putString("StudentSection", section)
-                apply()
-            }
-
-            Toast.makeText(this, "Datos ay nai-save!", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
         }
-
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
         dialog.show()
     }
 }
