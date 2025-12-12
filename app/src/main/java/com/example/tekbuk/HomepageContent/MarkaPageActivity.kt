@@ -139,7 +139,7 @@ class MarkaPageActivity : AppCompatActivity() {
         val score3 = prefs.getInt("${topic}_LEVEL_3_SCORE", 0)
 
         if (score3 > 0) {
-            scoreViews.third.text = "$score3/10"
+            scoreViews.third.text = "$score3/10 pts"
             scoreViews.third.setTextColor(resources.getColor(R.color.one))
             scoreViews.third.setTypeface(null, Typeface.BOLD)
         } else if (answer3.isNotEmpty()) {
