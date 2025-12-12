@@ -360,6 +360,7 @@ class TeacherDashboardActivity : AppCompatActivity() {
         val btnSave = dialogView.findViewById<Button>(R.id.btnSaveEssayGrade)
 
         val maxScore = if (dataKey == "repleksyon_main") 30 else 10
+        val scoreKey = "${dataKey}_score"
 
         val answer = student.rawData["${dataKey}_answer"] as? String ?: "Answer not found."
         val currentScore = (student.rawData["${dataKey}_score"] as? Number)?.toInt() ?: 0
@@ -367,6 +368,8 @@ class TeacherDashboardActivity : AppCompatActivity() {
         tvEssayTitle.text = title
         tvEssayAnswer.text = answer
         etEssayScore.hint = "Score / $maxScore"
+
+        etEssayScore.setHintTextColor(resources.getColor(R.color.one, theme))
 
         if (currentScore > 0) {
             etEssayScore.setText(currentScore.toString())
@@ -384,11 +387,27 @@ class TeacherDashboardActivity : AppCompatActivity() {
                     Toast.makeText(this, "Score cannot exceed $maxScore points.", Toast.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
+                // --- START OF FIX: RECALCULATE TOTAL SCORE ---
 
+                // 1. Get the student's total score and the old score for this specific essay.
+                val currentTotalScore = student.total_score
+                val oldEssayScore = (student.rawData[scoreKey] as? Number)?.toInt() ?: 0
+
+                // 2. Calculate the new total score.
+                // Formula: newTotal = currentTotal - oldScore + newScore
+                val newTotalScore = currentTotalScore - oldEssayScore + newScore
+
+                // 3. Prepare a map with BOTH the essay score AND the updated total score.
+                val updates = mapOf(
+                    scoreKey to newScore,          // e.g., "tula_l3_score" to 10
+                    "total_score" to newTotalScore // Update the main total
+                )
+
+                // --- END OF FIX ---
                 val scoreKey = "${dataKey}_score"
 
                 db.collection("quiz_results").document(student.id)
-                    .update(scoreKey, newScore)
+                    .update(updates)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Grade saved!", Toast.LENGTH_SHORT).show()
                         fetchDataFromFirebase()
