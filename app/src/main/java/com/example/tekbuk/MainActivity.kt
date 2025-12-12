@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.Button
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -35,7 +33,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        // Use binding to access views for better performance and type safety
         binding.cardPaksa.setOnClickListener {
             startActivity(Intent(this, PaksaPageActivity::class.java))
         }
@@ -44,11 +41,18 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, GawainPageActivity::class.java))
         }
 
+        // ⭐ MODIFIED THIS CLICK LISTENER ⭐
         binding.cardPagtataya.setOnClickListener {
-            startActivity(Intent(this, PagtatayaPageActivity::class.java))
+            // Check if all "Paksa" topics are 100% complete
+            if (areAllPaksaCompleted()) {
+                // If complete, open the Pagtataya page
+                startActivity(Intent(this, PagtatayaPageActivity::class.java))
+            } else {
+                // If not complete, show the same pop-up dialog
+                showPaksaIncompleteDialog()
+            }
         }
 
-        // ⭐ MODIFIED THIS CLICK LISTENER
         binding.cardRepleksyon.setOnClickListener {
             // Check if all "Paksa" topics are 100% complete
             if (areAllPaksaCompleted()) {
@@ -71,14 +75,12 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Checks SharedPreferences to see if all Paksa topics have a progress of 100.
+     * This function is now reused for both Pagtataya and Repleksyon.
      */
     private fun areAllPaksaCompleted(): Boolean {
-        // List of all topic keys used in SharedPreferences
         val topics = listOf("TULA", "SANAYSAY", "DAGLI", "TALUMPATI", "KWENTONG BAYAN")
         val prefs = getSharedPreferences("PaksaProgress", Context.MODE_PRIVATE)
 
-        // The '.all' function checks if the condition is true for every item in the list.
-        // It will return false as soon as it finds one topic that is not 100.
         return topics.all { topic ->
             prefs.getInt("${topic}_progress", 0) == 100
         }
@@ -86,6 +88,7 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Displays a custom CardView dialog informing the user to complete all topics.
+     * This function is also reused.
      */
     private fun showPaksaIncompleteDialog() {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_paksa_incomplete, null)
