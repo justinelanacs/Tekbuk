@@ -66,7 +66,8 @@ class KWENTONGBAYAN_level3 : AppCompatActivity() {
 
         val btnSubmitToTeacher = dialogView.findViewById<Button>(R.id.btnSubmitToTeacher)
         btnSubmitToTeacher.setOnClickListener {
-            saveFinalScore("KWENTONG_BAYAN", 3, 3) // Temporary score of 3
+            val answer = answerEditText.text.toString().trim()
+            saveReflection(answer)
             clearSavedText()
 
             Toast.makeText(this, "Ipinadala na sa guro!", Toast.LENGTH_SHORT).show()
@@ -101,9 +102,11 @@ class KWENTONGBAYAN_level3 : AppCompatActivity() {
         prefs.edit().remove(KEY_ESSAY_TEXT).apply()
     }
 
-    private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
+    private fun saveReflection(answer: String) {
         val prefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
-        val key = "${topic}_LEVEL_${level}"
-        prefs.edit().putInt(key, scoreToSave).apply()
+        val editor = prefs.edit()
+        // ⭐ KEY FIX: Added underscore to match MarkaPageActivity's expectation
+        editor.putString("KWENTONG_BAYAN_LEVEL_3_ANSWER", answer)
+        editor.apply()
     }
 }

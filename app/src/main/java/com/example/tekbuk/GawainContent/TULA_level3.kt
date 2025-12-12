@@ -21,10 +21,11 @@ class TULA_level3 : AppCompatActivity() {
 
     private lateinit var answerEditText: EditText
 
-    // ⭐ Define keys for saving and loading the text and completion status
     companion object {
         const val PREFS_NAME = "TULA_Level3_Progress"
         const val KEY_ESSAY_TEXT = "essay_text"
+        // Defines the specific topic ID for this activity
+        const val TOPIC_KEY = "TULA"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,20 +33,19 @@ class TULA_level3 : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_tula_level3)
 
-        // Standard window insets handling
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Initialize the EditText from your layout
         answerEditText = findViewById(R.id.etLevel3Answer)
 
-        // Set up the submit button
+        // Load any previously saved draft logic
+        loadSavedText()
+
         val btnSubmit = findViewById<Button>(R.id.btnSubmitLevel3)
         btnSubmit.setOnClickListener {
-            // Check if the user has written anything before allowing submission
             if (answerEditText.text.toString().trim().isNotEmpty()) {
                 showScoreDialog()
             } else {
@@ -56,13 +56,11 @@ class TULA_level3 : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // ⭐ [FIX] Restore the saved text when the user returns to the activity
         loadSavedText()
     }
 
     override fun onPause() {
         super.onPause()
-        // ⭐ [FIX] Save the current text when the user leaves the activity (e.g., presses back)
         saveCurrentText()
     }
 
@@ -77,64 +75,72 @@ class TULA_level3 : AppCompatActivity() {
 
         val btnSubmitToTeacher = dialogView.findViewById<Button>(R.id.btnSubmitToTeacher)
         btnSubmitToTeacher.setOnClickListener {
-            // ⭐ [ADD] Save a score to MarkaPage when the user submits
-            // Assuming a full score of 10 for completion. You can change this value.
-            saveFinalScore("TULA", 3, 3)
+            val answer = answerEditText.text.toString().trim()
 
-            // Clear the saved essay text since it's now "submitted"
+            // 1. Save the final answer for the MarkaPage/Teacher Dashboard
+            saveReflectionForGrading(answer)
+
+            // 2. Clear the local draft since it is submitted
             clearSavedText()
 
             Toast.makeText(this, "Ipinadala na sa guro!", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
 
-            // ⭐ [ADD] Set the activity result to unlock the next section in GawainPage
+            // 3. Return result to previous menu
             val resultIntent = Intent().apply {
                 putExtra("paksa_id", "tula")
                 putExtra("level_completed", 3)
-                putExtra("score", 3) // Sending the score back
             }
             setResult(Activity.RESULT_OK, resultIntent)
-            finish() // Close the activity
+            finish()
         }
 
         dialog.show()
     }
 
-    /**
-     * Saves the current text from the EditText to SharedPreferences.
-     */
+    // --- HELPER FUNCTIONS ---
+
     private fun saveCurrentText() {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(KEY_ESSAY_TEXT, answerEditText.text.toString()).apply()
     }
 
-    /**
-     * Loads the saved text from SharedPreferences and sets it into the EditText.
-     */
     private fun loadSavedText() {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val savedText = prefs.getString(KEY_ESSAY_TEXT, null)
+        // 1. First try to load from the draft
+        val draftPrefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val savedText = draftPrefs.getString(KEY_ESSAY_TEXT, null)
+
         if (savedText != null) {
             answerEditText.setText(savedText)
+        } else {
+            // 2. If no draft, check if they already submitted an answer previously (UserScores)
+            // This matches the logic in RepleksyonPageActivity
+            val scoresPrefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
+            val submittedAnswer = scoresPrefs.getString("${TOPIC_KEY}_LEVEL_3_ANSWER", "")
+            if (!submittedAnswer.isNullOrEmpty()) {
+                answerEditText.setText(submittedAnswer)
+            }
         }
     }
 
-    /**
-     * Clears the saved essay text from SharedPreferences after submission.
-     */
     private fun clearSavedText() {
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().remove(KEY_ESSAY_TEXT).apply()
     }
 
-    /**
-     * Saves the final score to the shared "UserScores" file so MarkaPageActivity can find it.
-     */
-    private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
+    private fun saveReflectionForGrading(answer: String) {
+        // We use "UserScores" to match what MarkaPageActivity reads
         val prefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
         val editor = prefs.edit()
-        val key = "${topic}_LEVEL_${level}" // Creates key like "TULA_LEVEL_3"
-        editor.putInt(key, scoreToSave)
+
+        // Save the answer text
+        // Key format: "TULA_LEVEL_3_ANSWER"
+        editor.putString("${TOPIC_KEY}_LEVEL_3_ANSWER", answer)
+
+        // Save the submitted status flag
+        // Key format: "TULA_LEVEL_3_SUBMITTED"
+        editor.putBoolean("${TOPIC_KEY}_LEVEL_3_SUBMITTED", true)
+
         editor.apply()
     }
 }

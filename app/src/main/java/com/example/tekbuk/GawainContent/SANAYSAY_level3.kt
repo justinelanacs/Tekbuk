@@ -29,7 +29,6 @@ class SANAYSAY_level3 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        // Make sure you have a layout file named "activity_sanaysay_level3.xml"
         setContentView(R.layout.activity_sanaysay_level3)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -39,6 +38,7 @@ class SANAYSAY_level3 : AppCompatActivity() {
         }
 
         answerEditText = findViewById(R.id.etLevel3Answer)
+
         val btnSubmit = findViewById<Button>(R.id.btnSubmitLevel3)
         btnSubmit.setOnClickListener {
             if (answerEditText.text.toString().trim().isNotEmpty()) {
@@ -60,15 +60,18 @@ class SANAYSAY_level3 : AppCompatActivity() {
     }
 
     private fun showScoreDialog() {
-        // I'm assuming the dialog layout is generic and can be reused.
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_level3_score, null)
-        val builder = AlertDialog.Builder(this).setView(dialogView).setCancelable(true)
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val btnSubmitToTeacher = dialogView.findViewById<Button>(R.id.btnSubmitToTeacher)
         btnSubmitToTeacher.setOnClickListener {
-            saveFinalScore("SANAYSAY", 3, 3) // Temporary score of 3
+            val answer = answerEditText.text.toString().trim()
+            saveReflection(answer)
             clearSavedText()
 
             Toast.makeText(this, "Ipinadala na sa guro!", Toast.LENGTH_SHORT).show()
@@ -77,11 +80,11 @@ class SANAYSAY_level3 : AppCompatActivity() {
             val resultIntent = Intent().apply {
                 putExtra("paksa_id", "sanaysay")
                 putExtra("level_completed", 3)
-                putExtra("score", 3)
             }
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
         }
+
         dialog.show()
     }
 
@@ -103,9 +106,10 @@ class SANAYSAY_level3 : AppCompatActivity() {
         prefs.edit().remove(KEY_ESSAY_TEXT).apply()
     }
 
-    private fun saveFinalScore(topic: String, level: Int, scoreToSave: Int) {
+    private fun saveReflection(answer: String) {
         val prefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
-        val key = "${topic}_LEVEL_${level}"
-        prefs.edit().putInt(key, scoreToSave).apply()
+        val editor = prefs.edit()
+        editor.putString("SANAYSAY_LEVEL_3_ANSWER", answer)
+        editor.apply()
     }
 }
