@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+
+    <!-- FrameLayout allows us to stack views, like the score input on top of the content -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Main content container -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/tvEssayTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Repleksyon Title"
+                android:textColor="@color/one"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"/>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
+                <TextView
+                    android:id="@+id/tvEssayAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="The student's full answer will be displayed here."
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </ScrollView>
+
+            <Button
+                android:id="@+id/btnSaveEssayGrade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/one"
+                android:text="Save Grade"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <!-- Score input box, aligned to the top right -->
+        <EditText
+            android:id="@+id/etEssayScore"
+            android:layout_width="80dp"
+            android:layout_height="25dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:background="@drawable/edittext_bg"
+            android:gravity="center"
+            android:hint="Score"
+            android:inputType="number"
+            android:maxLength="2"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>
