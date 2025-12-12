@@ -9,14 +9,16 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp">
 
+    <!-- A single horizontal LinearLayout is enough to align everything -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
         android:background="@color/white"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
+        <!-- This LinearLayout for Name and Section takes up all available space -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -27,27 +29,43 @@
                 android:id="@+id/tvStudentName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Student Name"
-                android:textStyle="bold"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:textColor="@color/black"/>
+                android:textStyle="bold"
+                tools:text="Student Name" />
 
             <TextView
                 android:id="@+id/tvSection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Section"
+                android:textColor="@color/one"
                 android:textSize="14sp"
-                android:textColor="@color/one"/>
+                tools:text="Section" />
         </LinearLayout>
 
+        <!-- Score TextView with margin to create space -->
         <TextView
             android:id="@+id/tvTotalScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0 pts"
-            android:textStyle="bold"
+            android:layout_marginEnd="16dp"
+            android:textColor="@color/one"
             android:textSize="18sp"
-            android:textColor="@color/one"/>
+            android:textStyle="bold"
+            tools:text="0 pts" />
+
+        <!-- ⭐ DELETE ICON IS NOW INSIDE THE MAIN LINEARLAYOUT ⭐ -->
+        <!-- It will be vertically centered automatically due to the parent's gravity -->
+        <ImageView
+            android:id="@+id/ivDeleteStudent"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="Delete Student Record"
+            android:focusable="true"
+            android:src="@drawable/delete"
+            app:tint="@android:color/holo_red_light" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

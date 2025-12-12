@@ -282,20 +282,26 @@
                             android:textSize="16sp"
                             android:textAppearance="?attr/textAppearanceBody1" />
 
+                        <!-- VVVV THIS IS THE CORRECTED TEXTVIEW VVVV -->
                         <TextView
                             android:id="@+id/textViewRepleksyonStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:background="@drawable/placeholder_score_background"
                             android:gravity="center"
+                            android:minWidth="80dp"
                             android:paddingStart="16dp"
                             android:paddingTop="4dp"
                             android:paddingEnd="16dp"
                             android:paddingBottom="4dp"
-                            tools:text="Naipasa na"
-                            android:textAppearance="?attr/textAppearanceBody1" />
+                            android:textAppearance="?attr/textAppearanceBody1"
+                            android:textColor="@color/black"
+                            tools:text="Naipasa na" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+
 
 
             <!-- TULA Section -->

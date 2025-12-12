@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.tekbuk.R
 import com.example.tekbuk.databinding.MarkaPageBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import java.util.Date
@@ -22,6 +24,7 @@ class MarkaPageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = MarkaPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -276,6 +279,26 @@ class MarkaPageActivity : AppCompatActivity() {
                 }
         } else {
              loadAndDisplayScores() // Load local scores if no user profile is set
+        }
+    }
+
+    private fun updateRepleksyonStatus() {
+        val prefs = getSharedPreferences("UserScores", Context.MODE_PRIVATE)
+        val isSubmitted = prefs.getBoolean("REPLEKSYON_SUBMITTED", false)
+        val cardRepleksyon = findViewById<MaterialCardView>(R.id.cardRepleksyon)
+        val statusTextView = findViewById<TextView>(R.id.textViewRepleksyonStatus)
+
+        // Make the entire card visible
+        cardRepleksyon.visibility = View.VISIBLE
+
+        if (isSubmitted) {
+            statusTextView.text = "Naipasa na"
+            // ⭐ FIX: Set the text color to white when submitted ⭐
+            statusTextView.setTextColor(resources.getColor(R.color.white, theme))
+        } else {
+            statusTextView.text = "Hindi pa naipapasa"
+            // ⭐ FIX: Set the text color back to your default (e.g., black) when not submitted ⭐
+            statusTextView.setTextColor(resources.getColor(R.color.black, theme))
         }
     }
 }

@@ -12,7 +12,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.ScrollView
@@ -77,13 +76,87 @@ class TeacherDashboardActivity : AppCompatActivity() {
         }
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = StudentAdapter(filteredStudentList) { selectedStudent ->
-            showStudentDetailsDialog(selectedStudent)
-        }
+
+        // UPDATE ADAPTER INITIALIZATION
+        // It now takes two lambda functions: one for item clicks, one for delete clicks.
+        adapter = StudentAdapter(
+            filteredStudentList,
+            onItemClicked = { selectedStudent ->
+                showStudentDetailsDialog(selectedStudent)
+            },
+            onDeleteClicked = { studentToDelete ->
+                showDeleteConfirmationDialog(studentToDelete)
+            }
+        )
         recyclerView.adapter = adapter
 
         fetchDataFromFirebase()
     }
+
+    // --- START OF NEW DELETE FUNCTIONS ---
+
+    private fun showDeleteConfirmationDialog(student: StudentResult) {
+        // 1. Inflate the custom layout
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_confirmation, null)
+
+        // 2. Create the AlertDialog with the custom view
+        val builder = AlertDialog.Builder(this)
+            .setView(dialogView)
+
+        // 3. Find views inside the custom layout
+        val messageTextView = dialogView.findViewById<TextView>(R.id.tvDialogMessage)
+        val cancelButton = dialogView.findViewById<Button>(R.id.btnCancel)
+        val deleteButton = dialogView.findViewById<Button>(R.id.btnDelete)
+
+        // 4. Set the dynamic message for the specific student
+        messageTextView.text = "Are you sure you want to permanently delete all records for ${student.studentName}?\n\nThis action cannot be undone."
+
+        // 5. Create the dialog and make its background transparent
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        // 6. Set click listeners for the custom buttons
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        deleteButton.setOnClickListener {
+            deleteStudentData(student)
+            dialog.dismiss()
+        }
+
+        // 7. Show the dialog
+        dialog.show()
+    }
+
+
+    private fun deleteStudentData(student: StudentResult) {
+        if (student.id.isBlank()) {
+            Toast.makeText(this, "Cannot delete: Student ID is missing.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        progressBar.visibility = View.VISIBLE
+        db.collection("quiz_results").document(student.id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "${student.studentName}'s record deleted successfully.", Toast.LENGTH_SHORT).show()
+                // Refresh the list from local memory for a faster UI update
+                val studentToRemove = allStudentsList.find { it.id == student.id }
+                if (studentToRemove != null) {
+                    allStudentsList.remove(studentToRemove)
+                }
+                // Re-apply the current filter to update the RecyclerView
+                filterStudentList(sectionSpinner.selectedItem.toString())
+                progressBar.visibility = View.GONE
+            }
+            .addOnFailureListener { e ->
+                progressBar.visibility = View.GONE
+                Toast.makeText(this, "Failed to delete record: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    // --- END OF NEW DELETE FUNCTIONS ---
 
     private fun signOutAndReturn() {
         auth.signOut()
@@ -206,10 +279,10 @@ class TeacherDashboardActivity : AppCompatActivity() {
             val l1 = (student.rawData["${topic}_l1"] as? Number)?.toInt() ?: -1
             val l2 = (student.rawData["${topic}_l2"] as? Number)?.toInt() ?: -1
             if (l1 >= 0) {
-                 mainContainer.addView(createScoreView("${topic.uppercase()} Level 1", "${l1.takeIf { it >= 0 } ?: "N/A"}"))
+                mainContainer.addView(createScoreView("${topic.uppercase()} Level 1", "${l1.takeIf { it >= 0 } ?: "N/A"}"))
             }
             if (l2 >= 0) {
-                 mainContainer.addView(createScoreView("${topic.uppercase()} Level 2", "${l2.takeIf { it >= 0 } ?: "N/A"}"))
+                mainContainer.addView(createScoreView("${topic.uppercase()} Level 2", "${l2.takeIf { it >= 0 } ?: "N/A"}"))
             }
         }
 
@@ -220,36 +293,28 @@ class TeacherDashboardActivity : AppCompatActivity() {
     }
 
     private fun showGradingDialog(student: StudentResult) {
-        // --- This is the new MAIN grading dialog ---
-
         val dialogView = layoutInflater.inflate(R.layout.dialog_student_details, null)
         val builder = AlertDialog.Builder(this).setView(dialogView)
 
-        // Find views from the layout (we are reusing dialog_student_details)
         val title = dialogView.findViewById<TextView>(R.id.tvDialogStudentName)
         val section = dialogView.findViewById<TextView>(R.id.tvDialogStudentSection)
         val btn1 = dialogView.findViewById<Button>(R.id.btnViewScores)
         val btn2 = dialogView.findViewById<Button>(R.id.btnGradeReflections)
 
-        // We will replace the content of these views dynamically
         title.text = "Grade Reflections"
         section.text = student.studentName
 
-        // Hide the buttons initially, we will add new ones programmatically
         btn1.visibility = View.GONE
         btn2.visibility = View.GONE
 
-        // The parent layout where we will add our new buttons
         val buttonContainer = btn1.parent as LinearLayout
         val topicsWithAnswers = mutableListOf<Pair<String, String>>()
 
-        // Check for the main reflection
         val mainRepAnswer = student.rawData["repleksyon_main_answer"] as? String
         if (!mainRepAnswer.isNullOrEmpty()) {
             topicsWithAnswers.add("PANGKALAHATANG REPLEKSYON" to "repleksyon_main")
         }
 
-        // Check for topic-specific reflections
         val topics = listOf("tula", "sanaysay", "dagli", "talumpati", "kwentong_bayan")
         for (topic in topics) {
             val l3Answer = student.rawData["${topic}_l3_answer"] as? String
@@ -260,37 +325,32 @@ class TeacherDashboardActivity : AppCompatActivity() {
 
         if (topicsWithAnswers.isEmpty()) {
             Toast.makeText(this, "No reflection answers submitted by this student.", Toast.LENGTH_LONG).show()
-            return // Stop if there's nothing to grade
+            return
         }
 
         val dialog = builder.create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-        // Dynamically create a button for each submitted reflection
         for ((buttonTitle, dataKey) in topicsWithAnswers) {
             val button = Button(this).apply {
                 text = buttonTitle
                 backgroundTintList = ColorStateList.valueOf(resources.getColor(R.color.one, theme))
                 setTextColor(resources.getColor(R.color.white, theme))
-                // Add some margin
                 val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
                 params.setMargins(0, 8, 0, 8)
                 layoutParams = params
             }
             button.setOnClickListener {
-                // When clicked, show the specific grading pop-up
-                dialog.dismiss() // Close the main list
+                dialog.dismiss()
                 showEssayGradingPopup(student, buttonTitle, dataKey)
             }
-            buttonContainer.addView(button) // Add the new button to the layout
+            buttonContainer.addView(button)
         }
 
         dialog.show()
     }
 
     private fun showEssayGradingPopup(student: StudentResult, title: String, dataKey: String) {
-        // --- This is the new HELPER dialog for grading a specific essay ---
-
         val dialogView = layoutInflater.inflate(R.layout.dialog_grade_essay, null)
         val builder = AlertDialog.Builder(this).setView(dialogView)
 
@@ -299,17 +359,13 @@ class TeacherDashboardActivity : AppCompatActivity() {
         val etEssayScore = dialogView.findViewById<EditText>(R.id.etEssayScore)
         val btnSave = dialogView.findViewById<Button>(R.id.btnSaveEssayGrade)
 
-        // ⭐ 1. DETERMINE THE MAX SCORE BASED ON THE DATAKEY ⭐
         val maxScore = if (dataKey == "repleksyon_main") 30 else 10
 
-        // Get the specific answer and score for this essay
         val answer = student.rawData["${dataKey}_answer"] as? String ?: "Answer not found."
         val currentScore = (student.rawData["${dataKey}_score"] as? Number)?.toInt() ?: 0
 
         tvEssayTitle.text = title
         tvEssayAnswer.text = answer
-
-        // ⭐ 2. UPDATE THE HINT TO SHOW THE MAX SCORE ⭐
         etEssayScore.hint = "Score / $maxScore"
 
         if (currentScore > 0) {
@@ -324,20 +380,18 @@ class TeacherDashboardActivity : AppCompatActivity() {
             if (scoreStr.isNotEmpty()) {
                 val newScore = scoreStr.toInt()
 
-                // ⭐ 3. VALIDATE THE SCORE AGAINST THE MAX SCORE ⭐
                 if (newScore > maxScore) {
                     Toast.makeText(this, "Score cannot exceed $maxScore points.", Toast.LENGTH_LONG).show()
-                    return@setOnClickListener // Stop the save process
+                    return@setOnClickListener
                 }
 
-                val scoreKey = "${dataKey}_score" // e.g., "repleksyon_main_score" or "tula_l3_score"
+                val scoreKey = "${dataKey}_score"
 
-                // Update the single grade in Firebase
                 db.collection("quiz_results").document(student.id)
                     .update(scoreKey, newScore)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Grade saved!", Toast.LENGTH_SHORT).show()
-                        fetchDataFromFirebase() // Refresh all data to get the latest scores
+                        fetchDataFromFirebase()
                         dialog.dismiss()
                     }
                     .addOnFailureListener { e ->
@@ -350,9 +404,6 @@ class TeacherDashboardActivity : AppCompatActivity() {
 
         dialog.show()
     }
-
-
-
 
     private fun createScoreView(title: String, score: String): View {
         val card = CardView(this).apply {
@@ -386,41 +437,6 @@ class TeacherDashboardActivity : AppCompatActivity() {
         })
         card.addView(layout)
         return card
-    }
-
-    private fun createEssayGradingView(title: String, answer: String, currentScore: Int): View {
-        val essayContainer = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundResource(R.drawable.edittext_bg)
-            setPadding(25, 25, 25, 25)
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                setMargins(0, 0, 0, 30)
-            }
-        }
-
-        essayContainer.addView(TextView(this).apply {
-            text = title
-            textSize = 14f
-            setTypeface(null, Typeface.BOLD)
-            setTextColor(resources.getColor(R.color.one, theme))
-        })
-
-        essayContainer.addView(TextView(this).apply {
-            text = answer
-            setTextColor(resources.getColor(R.color.black, theme))
-            textSize = 14f
-            setPadding(0, 10, 0, 10)
-        })
-
-        val scoreInput = EditText(this).apply {
-            hint = "Enter score"
-            setText(if (currentScore > 0) currentScore.toString() else "")
-            tag = "input"
-        }
-
-        essayContainer.addView(scoreInput)
-
-        return essayContainer
     }
 }
 
