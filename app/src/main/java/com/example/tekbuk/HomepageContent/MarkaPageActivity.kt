@@ -120,7 +120,7 @@ class MarkaPageActivity : AppCompatActivity() {
         return if (isFinished) {
             val score = prefs.getInt("FinalScore", 0)
             val totalItems = prefs.getInt("FinalTotalItems", 30)
-            binding.textViewPagtatayaScore.text = "$score / $totalItems"
+            binding.textViewPagtatayaScore.text = "Total: $score/$totalItems"
             binding.textViewPagtatayaScore.setTextColor(resources.getColor(R.color.one))
             binding.cardPagtataya.visibility = View.VISIBLE
             true
@@ -142,7 +142,7 @@ class MarkaPageActivity : AppCompatActivity() {
         val score3 = prefs.getInt("${topic}_LEVEL_3_SCORE", 0)
 
         if (score3 > 0) {
-            scoreViews.third.text = "$score3/10 pts"
+            scoreViews.third.text = "$score3 pts"
             scoreViews.third.setTextColor(resources.getColor(R.color.one))
             scoreViews.third.setTypeface(null, Typeface.BOLD)
         } else if (answer3.isNotEmpty()) {
